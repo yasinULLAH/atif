@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Invoice management system for Like Lion General Transport & Maintenance, generating tax invoices, managing client and supplier data, with backup and restore functionality.">
+    <meta name="keywords"
+        content="invoice, tax invoice, transport, maintenance, Like Lion, data management, backup, restore, Pakistan, Yasin Ullah">
+    <meta name="author" content="Yasin Ullah, Pakistan">
+    <title>Like Lion Tax Invoice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --border-color: #dee2e6;
+            --header-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .printable-area {
+            padding: 2rem;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .company-info-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .company-logo {
+            max-width: 70px;
+            height: auto;
+        }
+
+        .company-title {
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        .company-title .arabic {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #34495e;
+        }
+
+        .company-title .english {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .date-ref-block {
+            text-align: right;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .date-ref-block div {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .date-ref-block label {
+            min-width: 80px;
+            text-align: left;
+            margin-right: 5px;
+        }
+
+        .date-ref-block input {
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            max-width: 150px;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .client-supplier-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .client-info,
+        .invoice-details {
+            padding: 1rem;
+        }
+
+        .client-info {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .info-block div {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .info-block label {
+            font-weight: 500;
+            min-width: 120px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .info-block input,
+        .info-block select {
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            flex-grow: 1;
+        }
+
+        .info-block input[readonly] {
+            background-color: #f8f9fa;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.6rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .invoice-table thead {
+            background-color: var(--header-bg);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .invoice-table thead tr:last-child th {
+            font-weight: normal;
+            font-size: 0.9rem;
+        }
+
+        .invoice-table input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            background-color: transparent;
+            padding: 0.25rem;
+        }
+
+        .invoice-table input:focus {
+            outline: 1px solid var(--primary-color);
+            background-color: #f0f8ff;
+        }
+
+        .invoice-table input[type="number"]::-webkit-inner-spin-button,
+        .invoice-table input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .invoice-table input[readonly] {
+            font-weight: 500;
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .table-actions {
+            text-align: right;
+            margin-top: -1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-signature-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .summary-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.3rem 0;
+        }
+
+        .summary-line label {
+            font-weight: 500;
+        }
+
+        .summary-line input {
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            width: 120px;
+            text-align: right;
+            background-color: #f8f9fa;
+        }
+
+        .total-amount-line {
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .total-amount-in-words {
+            font-style: italic;
+            font-weight: 500;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .signature-block {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 100px;
+        }
+
+        .signature-block input {
+            width: 80%;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            margin-top: 1rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .signature-block img {
+            max-height: 70px;
+            margin-top: 5px;
+        }
+
+        .company-stamp {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .company-stamp img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .footer-contact > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-contact i {
+            color: var(--secondary-color);
+        }
+
+        .actions-bar {
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .actions-bar .btn,
+        .actions-bar .form-select {
+            min-width: 120px;
+        }
+
+        #restore-file-input {
+            display: none;
+        }
+
+        .logo-preview {
+            max-width: 150px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            padding: 5px;
+        }
+
+        .no-print {
+            /* This class will be hidden during printing/export */
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+            }
+
+            .no-print,
+            .modal,
+            .modal-backdrop {
+                display: none !important;
+            }
+
+            .main-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .printable-area {
+                padding: 0;
+            }
+
+            .client-supplier-info {
+                grid-template-columns: 1fr;
+            }
+
+            .client-info {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .summary-signature-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .printable-area {
+                padding: 1rem;
+            }
+
+            .invoice-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .company-info-logo {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .company-title {
+                text-align: left;
+            }
+
+            .date-ref-block {
+                text-align: left;
+                width: 100%;
+            }
+
+            .date-ref-block input {
+                max-width: none;
+            }
+
+            .client-supplier-info {
+                grid-template-columns: 1fr;
+            }
+
+            .client-info {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .info-block label {
+                min-width: 80px;
+            }
+
+            .info-block input,
+            .info-block select {
+                width: calc(100% - 90px);
+            }
+
+            .summary-signature-section {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .footer-contact {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        select {
+            width: 275px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="main-container" id="app">
+        <div class="actions-bar no-print">
+            <div class="d-flex flex-wrap gap-2">
+                <button id="new-invoice-btn" class="btn btn-primary"><i class="fas fa-file-alt me-1"></i>New</button>
+                <button id="save-invoice-btn" class="btn btn-success"><i class="fas fa-save me-1"></i>
+                    Save</button>
+                <select id="invoice-history" class="form-select" style="width: auto;">
+                    <option selected>Load</option>
+                </select>
+                <select id="customer-history" class="form-select" style="width: auto;">
+                    <option selected>Load Cust..</option>
+                </select>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button id="export-image-btn" class="btn btn-info"><i class="fas fa-file-image me-1"></i> Export
+                    Image</button>
+                <button id="settings-btn" class="btn btn-secondary" data-bs-toggle="modal"
+                    data-bs-target="#settingsModal"><i class="fas fa-cog me-1"></i> Settings</button>
+            </div>
+        </div>
+        <div class="printable-area" id="printable-area">
+            <header class="invoice-header">
+                <div class="company-info-logo">
+                    <img src="" alt="Company Logo" id="companyLogo" class="company-logo" style="display: none;">
+                    <div class="company-title">
+                        <div class="arabic" id="companyNameAR"></div>
+                        <div class="english" id="companyNameEN"></div>
+                    </div>
+                </div>
+                <div class="date-ref-block">
+                    <div><label for="refNo">Ref No.</label><input type="text" id="refNo" class="form-control-sm"
+                            data-field="refNo"></div>
+                    <div><label for="invoiceDate">Date:</label><input type="date" id="invoiceDate"
+                            class="form-control-sm" data-field="invoiceDate"></div>
+                </div>
+            </header>
+            <h3 class="invoice-title">TAX INVOICE</h3>
+            <section class="client-supplier-info">
+                <div class="client-info info-block">
+                    <div>
+                        <label>Customer:</label>
+                        <input type="text" id="customerName" class="form-control-sm" data-field="customerName"
+                            placeholder="Customer Name">
+                    </div>
+                    <div>
+                        <label>Address:</label>
+                        <input type="text" id="customerAddress" class="form-control-sm" data-field="customerAddress"
+                            placeholder="Customer Address">
+                    </div>
+                    <div>
+                        <label>PO Box:</label>
+                        <input type="text" id="customerPOBox" class="form-control-sm" data-field="customerPOBox"
+                            placeholder="PO Box">
+                    </div>
+                    <div>
+                        <label>Customer TRN:</label>
+                        <input type="text" id="customerTRN" class="form-control-sm" data-field="customerTRN"
+                            placeholder="Customer TRN">
+                    </div>
+                    <div>
+                        <label>Supplier Name:</label>
+                        <input type="text" id="supplierName" class="form-control-sm" data-field="supplierName"
+                            placeholder="Supplier Name" readonly>
+                    </div>
+                    <div>
+                        <label>Supplier Address:</label>
+                        <input type="text" id="supplierAddress" class="form-control-sm" data-field="supplierAddress"
+                            placeholder="Supplier Address" readonly>
+                    </div>
+                    <div>
+                        <label>PO Box:</label>
+                        <input type="text" id="supplierPOBox" class="form-control-sm" data-field="supplierPOBox"
+                            placeholder="Supplier PO Box" readonly>
+                    </div>
+                    <div>
+                        <label>E mail:</label>
+                        <input type="email" id="supplierEmail" class="form-control-sm" data-field="supplierEmail"
+                            placeholder="Supplier Email" readonly>
+                    </div>
+                    <div>
+                        <label>Supplier TRN:</label>
+                        <input type="text" id="supplierTRN" class="form-control-sm" data-field="supplierTRN"
+                            placeholder="Supplier TRN" readonly>
+                    </div>
+                </div>
+                <div class="invoice-details info-block">
+                    <div>
+                        <label for="invoiceNo">Invoice No:</label>
+                        <input type="text" id="invoiceNo" class="form-control-sm" data-field="invoiceNo">
+                    </div>
+                    <div>
+                        <label for="invoiceDateDetail">Invoice Date:</label>
+                        <input type="date" id="invoiceDateDetail" class="form-control-sm"
+                            data-field="invoiceDateDetail">
+                    </div>
+                    <div>
+                        <label for="orderNo">Order No:</label>
+                        <input type="text" id="orderNo" class="form-control-sm" data-field="orderNo">
+                    </div>
+                    <div>
+                        <label for="period">Period:</label>
+                        <input type="text" id="period" class="form-control-sm" data-field="period">
+                    </div>
+                </div>
+            </section>
+            <div class="table-actions no-print">
+                <button class="btn btn-sm btn-outline-primary" id="add-item-btn"><i class="fas fa-plus me-1"></i> Add
+                    Item</button>
+            </div>
+            <section class="table-responsive">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">SI</th>
+                            <th rowspan="2">Item Description</th>
+                            <th rowspan="2">Month</th>
+                            <th rowspan="2">Vehicle</th>
+                            <th rowspan="2">UOM</th>
+                            <th>Rate Per Month</th>
+                            <th colspan="4">Rate Per Hour</th>
+                            <th rowspan="2">Total Amount</th>
+                            <th rowspan="2" class="no-print">Actions</th>
+                        </tr>
+                        <tr>
+                            <th>260</th>
+                            <th>Normal Rate</th>
+                            <th>Overtime Rate</th>
+                            <th>Normal Hour</th>
+                            <th>Overtime Hour</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-items-body">
+                        <!-- Invoice items will be appended here -->
+                    </tbody>
+                </table>
+            </section>
+            <section class="summary-signature-section">
+                <div class="summary-block">
+                    <div class="total-amount-in-words" id="amountInWords"></div>
+                </div>
+                <div>
+                    <div class="summary-line">
+                        <label>Basic Amount</label>
+                        <input type="text" id="basicAmount" readonly>
+                    </div>
+                    <div class="summary-line">
+                        <label>Vat Amount</label>
+                        <input type="text" id="vatAmount" readonly>
+                    </div>
+                    <div class="summary-line total-amount-line">
+                        <label>Total Amount</label>
+                        <input type="text" id="totalAmount" readonly>
+                    </div>
+                </div>
+            </section>
+            <section class="summary-signature-section mt-4">
+                <div class="signature-block">
+                    <input type="text" id="authorizedSig" placeholder="Authorized Sig" data-field="authorizedSig">
+                    <img id="authorizedSigImg" class="signature-image" style="display:none; max-height:50px;" />
+                </div>
+                <div class="signature-block">
+                    <input type="text" id="receiverSig" placeholder="Receiver Sig" data-field="receiverSig">
+                    <img id="receiverSigImg" class="signature-image" style="display:none; max-height:50px;" />
+                </div>
+            </section>
+            <section class="company-stamp mt-4">
+                <img src="" alt="Company Stamp" id="companyStamp" style="display: none;">
+            </section>
+            <footer class="footer-contact">
+                <div>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <span id="footerAddressLine1"></span> <br>
+                        <span id="footerAddressLine2"></span> <br>
+                        <span id="footerAddressLine3"></span>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <div><i class="fas fa-phone"></i> <span id="footerMobile"></span></div>
+                        <div><i class="fas fa-envelope"></i> <span id="footerEmail"></span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </main>
+    <div class="modal fade no-print" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Admin Panel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="settingsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="company-info-tab" data-bs-toggle="tab"
+                                data-bs-target="#company-info" type="button" role="tab" aria-controls="company-info"
+                                aria-selected="true">Company Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="data-management-tab" data-bs-toggle="tab"
+                                data-bs-target="#data-management" type="button" role="tab"
+                                aria-controls="data-management" aria-selected="false">Backup & Restore</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="settingsTabContent">
+                        <div class="tab-pane fade show active" id="company-info" role="tabpanel"
+                            aria-labelledby="company-info-tab" style="padding-top: 1.5rem;">
+                            <div class="mb-3">
+                                <label for="settingsCompanyNameAR" class="form-label">Company Name (Arabic)</label>
+                                <input type="text" class="form-control" id="settingsCompanyNameAR">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyNameEN" class="form-label">Company Name (English)</label>
+                                <input type="text" class="form-control" id="settingsCompanyNameEN">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyAddress" class="form-label">Company Address</label>
+                                <input type="text" class="form-control" id="settingsCompanyAddress">
+                                <small class="form-text text-muted">Separate address lines with commas for display in
+                                    footer (e.g., "Line 1, Line 2, Line 3")</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyPOBox" class="form-label">Company P.O. Box</label>
+                                <input type="text" class="form-control" id="settingsCompanyPOBox">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyTRN" class="form-label">Company TRN</label>
+                                <input type="text" class="form-control" id="settingsCompanyTRN">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyMobile" class="form-label">Mobile No</label>
+                                <input type="text" class="form-control" id="settingsCompanyMobile">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="settingsCompanyEmail">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsVatRate" class="form-label">VAT Rate (%)</label>
+                                <input type="number" step="0.01" class="form-control" id="settingsVatRate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyLogo" class="form-label">Company Logo</label>
+                                <input class="form-control" type="file" id="settingsCompanyLogo" accept="image/*">
+                                <img id="logoPreview" src="#" alt="Logo Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsCompanyStamp" class="form-label">Company Stamp</label>
+                                <input class="form-control" type="file" id="settingsCompanyStamp" accept="image/*">
+                                <img id="stampPreview" src="#" alt="Stamp Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsAuthorizedSignature" class="form-label">Authorized Signature
+                                    Image</label>
+                                <input class="form-control" type="file" id="settingsAuthorizedSignature"
+                                    accept="image/*">
+                                <img id="authSigPreview" src="#" alt="Authorized Signature Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsReceiverSignature" class="form-label">Receiver Signature
+                                    Image</label>
+                                <input class="form-control" type="file" id="settingsReceiverSignature" accept="image/*">
+                                <img id="recSigPreview" src="#" alt="Receiver Signature Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mt-4 d-flex justify-content-end">
+                                <button type="button" id="save-settings-btn" class="btn btn-primary">Save Company
+                                    Info</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="data-management" role="tabpanel"
+                            aria-labelledby="data-management-tab" style="padding-top: 1.5rem;">
+                            <p>Create a full backup of all settings and invoice records, or restore the application from
+                                a backup file.</p>
+                            <div class="d-grid gap-2 col-md-8 mx-auto">
+                                <button id="backup-all-btn" class="btn btn-success"><i
+                                        class="fas fa-download me-2"></i>Backup All Data</button>
+                                <button id="restore-all-btn" class="btn btn-danger"><i
+                                        class="fas fa-upload me-2"></i>Restore from Backup</button>
+                                <input type="file" id="restore-file-input" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DB_NAME = 'LikeLionInvoiceDB_YasinUllah_V1';
+            const DB_VERSION = 1;
+            const SETTINGS_STORE = 'appSettings';
+            const INVOICES_STORE = 'archivedInvoices';
+            const CUSTOMERS_STORE = 'customerData';
+            let db;
+            let VAT_RATE = 0.05;
+            const appState = {
+                header: {},
+                clientSupplier: {},
+                invoiceDetails: {},
+                items: [],
+                footer: {}
+            };
+            function initDB() {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains(SETTINGS_STORE)) db.createObjectStore(SETTINGS_STORE, { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains(INVOICES_STORE)) db.createObjectStore(INVOICES_STORE, { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains(CUSTOMERS_STORE)) db.createObjectStore(CUSTOMERS_STORE, { keyPath: 'name' });
+                };
+                request.onsuccess = e => {
+                    db = e.target.result;
+                    loadSettings().then(settingsExist => {
+                        loadInvoiceHistory();
+                        loadCustomerHistory();
+                        if (settingsExist) {
+                            loadLatestInvoice();
+                        } else {
+                            createSampleData();
+                        }
+                    });
+                };
+                request.onerror = e => console.error('Database error:', e.target.errorCode);
+            }
+            function createSampleData() {
+                const defaultSettings = {
+                    companyNameAR: 'لايك ليون للنقليات العامة والصيانه',
+                    companyNameEN: 'Like Lion General Transport & Maintenance',
+                    companyAddress: 'Main Office:,Near Munir Restaurant:,Musaffah, 17 Abu Dhabi.',
+                    companyPOBox: 'PO BOX:',
+                    companyTRN: '100560613000003',
+                    companyMobile: '0553237349',
+                    companyEmail: 'likeliongeneral2021@gmail.com',
+                    vatRate: 5,
+                    companyLogo: '',
+                    companyStamp: '',
+                    authorizedSignature: '',
+                    receiverSignature: ''
+                };
+                const defaultInvoice = {
+                    header: {
+                        refNo: 'LL-001',
+                        invoiceDate: '2024-07-15'
+                    },
+                    clientSupplier: {
+                        customerName: 'VSL Middle East LLC',
+                        customerAddress: 'Al Gurg Tower 3, Office 1201,12th Floor, Baniyas Rd- 6 c ST, Deira- Riggat Al Buteen, Dubai, United Arab Emirates',
+                        customerPOBox: '121890',
+                        customerTRN: '100386739500003',
+                        supplierName: 'LIKE LION GEN. TRANSPORT & MAINTENENCE',
+                        supplierAddress: 'M-17 Mussafah Industrial area, Abu Dhabi, UAE',
+                        supplierPOBox: 'PO BOX:',
+                        supplierEmail: 'likeliongeneral2021@gmail.com',
+                        supplierTRN: '100560613000003'
+                    },
+                    invoiceDetails: {
+                        invoiceNo: '343',
+                        invoiceDateDetail: '2024-07-15',
+                        orderNo: '1001461637',
+                        period: 'June-25'
+                    },
+                    items: [
+                        { si: 1, description: 'Hiab Crane', month: 'June-25', vehicle: '98572', uom: 'Hour', ratePerMonth: '12500', normalRate: '48.07', overtimeRate: '48.07', normalHour: '200', overtimeHour: '0', totalAmount: '9614.00' },
+                        { si: 2, description: 'Telehandler', month: 'June-25', vehicle: '34567', uom: 'Hour', ratePerMonth: '10000', normalRate: '38.46', overtimeRate: '38.46', normalHour: '150', overtimeHour: '10', totalAmount: '6153.60' },
+                        { si: 3, description: 'Excavator', month: 'July-25', vehicle: '11223', uom: 'Hour', ratePerMonth: '15000', normalRate: '57.69', overtimeRate: '57.69', normalHour: '180', overtimeHour: '5', totalAmount: '10672.65' },
+                        { si: 4, description: 'Skid Steer Loader', month: 'July-25', vehicle: '99887', uom: 'Hour', ratePerMonth: '8000', normalRate: '30.77', overtimeRate: '30.77', normalHour: '100', overtimeHour: '0', totalAmount: '3077.00' }
+                    ],
+                    footer: {
+                        basicAmount: '29517.25',
+                        vatAmount: '1475.86',
+                        totalAmount: '30993.11',
+                        amountInWords: 'Thirty Thousand Nine Hundred Ninety-Three & Eleven Fills only',
+                        authorizedSig: 'Authorized Signatory',
+                        receiverSig: 'Receiver Signature'
+                    }
+                };
+                const sampleCustomer1 = {
+                    name: 'VSL Middle East LLC',
+                    address: 'Al Gurg Tower 3, Office 1201,12th Floor, Baniyas Rd- 6 c ST, Deira- Riggat Al Buteen, Dubai, United Arab Emirates',
+                    poBox: '121890',
+                    trn: '100386739500003'
+                };
+                const sampleCustomer2 = {
+                    name: 'Bin Hamoodah Trading & General Services',
+                    address: 'P.O. Box 203, Abu Dhabi, UAE',
+                    poBox: '203',
+                    trn: '100000012345678'
+                };
+                const sampleCustomer3 = {
+                    name: 'Al Falah Contracting Company',
+                    address: 'Office 10, Building 2, Industrial City, Dubai, UAE',
+                    poBox: '55667',
+                    trn: '100000098765432'
+                };
+                const sampleCustomer4 = {
+                    name: 'Emirates General Petroleum Corporation (Emarat)',
+                    address: 'Sheikh Zayed Road, Dubai, UAE',
+                    poBox: '99999',
+                    trn: '100000011223344'
+                };
+                saveSettings(defaultSettings, false);
+                saveCustomer(sampleCustomer1, false);
+                saveCustomer(sampleCustomer2, false);
+                saveCustomer(sampleCustomer3, false);
+                saveCustomer(sampleCustomer4, false);
+                const sampleId = `INV-${defaultInvoice.invoiceDetails.invoiceNo}-${defaultInvoice.invoiceDetails.invoiceDateDetail}`;
+                saveInvoice(sampleId, defaultInvoice, false).then(() => {
+                    location.reload();
+                });
+            }
+            function renderUI() {
+                document.getElementById('refNo').value = appState.header.refNo || '';
+                document.getElementById('invoiceDate').value = appState.header.invoiceDate || '';
+                Object.keys(appState.clientSupplier).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = appState.clientSupplier[key] || '';
+                });
+                Object.keys(appState.invoiceDetails).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = appState.invoiceDetails[key] || '';
+                });
+                renderInvoiceItems();
+                document.getElementById('basicAmount').value = appState.footer.basicAmount || '';
+                document.getElementById('vatAmount').value = appState.footer.vatAmount || '';
+                document.getElementById('totalAmount').value = appState.footer.totalAmount || '';
+                document.getElementById('amountInWords').textContent = appState.footer.amountInWords || '';
+                document.getElementById('authorizedSig').value = appState.footer.authorizedSig || '';
+                document.getElementById('receiverSig').value = appState.footer.receiverSig || '';
+                calculateTotals();
+                dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config').then(settings => {
+                    if (settings && settings.data) {
+                        applySignatureImage(settings.data.authorizedSignature, 'authorizedSigImg', 'authorizedSig');
+                        applySignatureImage(settings.data.receiverSignature, 'receiverSigImg', 'receiverSig');
+                    }
+                });
+            }
+            function renderInvoiceItems() {
+                const tbody = document.getElementById('invoice-items-body');
+                tbody.innerHTML = '';
+                const items = appState.items || [];
+                items.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.si}</td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="description" value="${item.description || ''}"></td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="month" value="${item.month || ''}"></td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="vehicle" value="${item.vehicle || ''}"></td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="uom" value="${item.uom || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="ratePerMonth" value="${item.ratePerMonth || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="normalRate" value="${item.normalRate || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="overtimeRate" value="${item.overtimeRate || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="normalHour" value="${item.normalHour || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="overtimeHour" value="${item.overtimeHour || ''}"></td>
+                        <td><input type="number" step="0.01" class="form-control-sm" data-row="${index}" data-field="totalAmount" value="${item.totalAmount || ''}" readonly></td>
+                        <td class="no-print">
+                            <button class="btn btn-sm btn-danger delete-item-btn" data-row="${index}"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                updateItemSerialNumbers();
+            }
+            function updateUISettings(settingsData) {
+                document.getElementById('companyNameAR').textContent = settingsData.companyNameAR;
+                document.getElementById('companyNameEN').textContent = settingsData.companyNameEN;
+                document.getElementById('footerMobile').textContent = settingsData.companyMobile;
+                document.getElementById('footerEmail').textContent = settingsData.companyEmail;
+                const addressLines = (settingsData.companyAddress || '').split(',').map(line => line.trim());
+                document.getElementById('footerAddressLine1').textContent = addressLines[0] || '';
+                document.getElementById('footerAddressLine2').textContent = addressLines[1] || '';
+                document.getElementById('footerAddressLine3').textContent = addressLines[2] || '';
+                appState.clientSupplier.supplierName = settingsData.companyNameEN;
+                appState.clientSupplier.supplierAddress = settingsData.companyAddress;
+                appState.clientSupplier.supplierPOBox = settingsData.companyPOBox;
+                appState.clientSupplier.supplierEmail = settingsData.companyEmail;
+                appState.clientSupplier.supplierTRN = settingsData.companyTRN;
+                document.getElementById('supplierName').value = appState.clientSupplier.supplierName;
+                document.getElementById('supplierAddress').value = appState.clientSupplier.supplierAddress;
+                document.getElementById('supplierPOBox').value = appState.clientSupplier.supplierPOBox;
+                document.getElementById('supplierEmail').value = appState.clientSupplier.supplierEmail;
+                document.getElementById('supplierTRN').value = appState.clientSupplier.supplierTRN;
+                const companyLogoEl = document.getElementById('companyLogo');
+                companyLogoEl.style.display = settingsData.companyLogo ? 'block' : 'none';
+                companyLogoEl.src = settingsData.companyLogo || '';
+                const companyStampEl = document.getElementById('companyStamp');
+                companyStampEl.style.display = settingsData.companyStamp ? 'block' : 'none';
+                companyStampEl.src = settingsData.companyStamp || '';
+                document.getElementById('settingsCompanyNameAR').value = settingsData.companyNameAR;
+                document.getElementById('settingsCompanyNameEN').value = settingsData.companyNameEN;
+                document.getElementById('settingsCompanyAddress').value = settingsData.companyAddress;
+                document.getElementById('settingsCompanyPOBox').value = settingsData.companyPOBox;
+                document.getElementById('settingsCompanyTRN').value = settingsData.companyTRN;
+                document.getElementById('settingsCompanyMobile').value = settingsData.companyMobile;
+                document.getElementById('settingsCompanyEmail').value = settingsData.companyEmail;
+                document.getElementById('settingsVatRate').value = settingsData.vatRate;
+                const logoPreview = document.getElementById('logoPreview');
+                logoPreview.style.display = settingsData.companyLogo ? 'block' : 'none';
+                logoPreview.src = settingsData.companyLogo || '';
+                const stampPreview = document.getElementById('stampPreview');
+                stampPreview.style.display = settingsData.companyStamp ? 'block' : 'none';
+                stampPreview.src = settingsData.companyStamp || '';
+                const authSigPreview = document.getElementById('authSigPreview');
+                authSigPreview.style.display = settingsData.authorizedSignature ? 'block' : 'none';
+                authSigPreview.src = settingsData.authorizedSignature || '';
+                const recSigPreview = document.getElementById('recSigPreview');
+                recSigPreview.style.display = settingsData.receiverSignature ? 'block' : 'none';
+                recSigPreview.src = settingsData.receiverSignature || '';
+                VAT_RATE = (parseFloat(settingsData.vatRate) || 0) / 100;
+                calculateTotals();
+            }
+            async function startNewInvoice() {
+                const currentDate = new Date().toISOString().slice(0, 10);
+                const newInvoiceNo = await generateNewInvoiceNumber();
+                Object.assign(appState, {
+                    header: { refNo: '', invoiceDate: currentDate },
+                    clientSupplier: {
+                        customerName: '', customerAddress: '', customerPOBox: '', customerTRN: '',
+                        supplierName: '', supplierAddress: '', supplierPOBox: '', supplierEmail: '', supplierTRN: ''
+                    },
+                    invoiceDetails: { invoiceNo: newInvoiceNo, invoiceDateDetail: currentDate, orderNo: '', period: '' },
+                    items: [{ si: 1, description: '', month: '', vehicle: '', uom: '', ratePerMonth: '', normalRate: '', overtimeRate: '', normalHour: '', overtimeHour: '', totalAmount: '' }],
+                    footer: { basicAmount: '', vatAmount: '', totalAmount: '', amountInWords: '', authorizedSig: '', receiverSig: '' }
+                });
+                renderUI();
+                loadSettings();
+            }
+            function generateNewInvoiceNumber() {
+                const prefix = "LLINV";
+                const date = new Date();
+                const year = date.getFullYear().toString().slice(-2);
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                return dbRequest(INVOICES_STORE, 'readonly', 'getAllKeys').then(keys => {
+                    const currentMonthInvoices = keys.filter(key => key.startsWith(`INV-${prefix}-${year}${month}`));
+                    let maxNum = 0;
+                    if (currentMonthInvoices.length > 0) {
+                        currentMonthInvoices.forEach(key => {
+                            const parts = key.split('-');
+                            const num = parseInt(parts[3], 10);
+                            if (!isNaN(num) && num > maxNum) {
+                                maxNum = num;
+                            }
+                        });
+                    }
+                    const newNum = (maxNum + 1).toString().padStart(4, '0');
+                    return `${prefix}-${year}${month}-${newNum}`;
+                }).catch(() => {
+                    return `${prefix}-${year}${month}-0001`;
+                });
+            }
+            function calculateRowTotal(rowIndex) {
+                const item = appState.items[rowIndex];
+                const normalRate = parseFloat(item.normalRate) || 0;
+                const overtimeRate = parseFloat(item.overtimeRate) || 0;
+                const normalHour = parseFloat(item.normalHour) || 0;
+                const overtimeHour = parseFloat(item.overtimeHour) || 0;
+                const total = (normalRate * normalHour) + (overtimeRate * overtimeHour);
+                item.totalAmount = total.toFixed(2);
+                document.querySelector(`#invoice-items-body tr:nth-child(${rowIndex + 1}) input[data-field="totalAmount"]`).value = item.totalAmount;
+                calculateTotals();
+            }
+            function calculateTotals() {
+                const items = appState.items || [];
+                let totalBasicAmount = items.reduce((sum, item) => sum + (parseFloat(item.totalAmount) || 0), 0);
+                const vatAmount = totalBasicAmount * VAT_RATE;
+                const totalAmount = totalBasicAmount + vatAmount;
+                appState.footer.basicAmount = totalBasicAmount.toFixed(2);
+                appState.footer.vatAmount = vatAmount.toFixed(2);
+                appState.footer.totalAmount = totalAmount.toFixed(2);
+                appState.footer.amountInWords = convertNumberToWords(totalAmount);
+                document.getElementById('basicAmount').value = appState.footer.basicAmount;
+                document.getElementById('vatAmount').value = appState.footer.vatAmount;
+                document.getElementById('totalAmount').value = appState.footer.totalAmount;
+                document.getElementById('amountInWords').textContent = appState.footer.amountInWords;
+            }
+            function convertNumberToWords(num) {
+                const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+                const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                let [intPart, decimalPart] = String(num.toFixed(2)).split('.');
+                const fullNum = parseInt(intPart) || 0;
+                const fills = parseInt(decimalPart) || 0;
+                if (fullNum === 0 && fills === 0) return 'Zero Only';
+                const numToWords = (n) => {
+                    if (n === 0) return '';
+                    if (n < 20) return a[n];
+                    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
+                    if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 !== 0 ? ' ' + numToWords(n % 100) : '');
+                    if (n < 100000) return numToWords(Math.floor(n / 1000)) + ' thousand' + (n % 1000 !== 0 ? ' ' + numToWords(n % 1000) : '');
+                    if (n < 10000000) return numToWords(Math.floor(n / 100000)) + ' lakh' + (n % 100000 !== 0 ? ' ' + numToWords(n % 100000) : '');
+                    return numToWords(Math.floor(n / 10000000)) + ' crore' + (n % 10000000 !== 0 ? ' ' + numToWords(n % 10000000) : '');
+                };
+                let words = '';
+                if (fullNum > 0) {
+                    words += numToWords(fullNum) + ' ';
+                }
+                words += 'only';
+                if (fills > 0) {
+                    words += (words.includes('only') && fullNum > 0 ? ' and ' : '') + numToWords(fills) + ' fills';
+                }
+                words = words.replace(/\s+/g, ' ').trim();
+                return words.charAt(0).toUpperCase() + words.slice(1);
+            }
+            function generateInvoiceIdFromState() {
+                const invoiceNo = appState.invoiceDetails.invoiceNo;
+                const invoiceDate = appState.invoiceDetails.invoiceDateDetail;
+                if (!invoiceNo || !invoiceDate) return null;
+                return `INV-${invoiceNo}-${invoiceDate}`;
+            }
+            function dbRequest(storeName, mode, action, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(storeName, mode);
+                    const store = transaction.objectStore(storeName);
+                    let request;
+                    if (action === 'put' || action === 'add') {
+                        request = store[action](data);
+                    } else if (action === 'get' || action === 'delete' || action === 'getAllKeys' || action === 'getAll' || action === 'clear') {
+                        request = store[action](data);
+                    } else {
+                        return reject(new Error('Invalid DB action'));
+                    }
+                    transaction.oncomplete = () => resolve(request.result);
+                    transaction.onerror = () => reject(transaction.error);
+                });
+            }
+            function saveSettings(settingsData, showAlert = true) {
+                dbRequest(SETTINGS_STORE, 'readwrite', 'put', { id: 'config', data: settingsData }).then(() => {
+                    updateUISettings(settingsData);
+                    if (showAlert) {
+                        const modalEl = document.getElementById('settingsModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        alert('Settings saved successfully!');
+                    }
+                });
+            }
+            function loadSettings() {
+                return dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config').then(settings => {
+                    if (settings) {
+                        updateUISettings(settings.data);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            function saveInvoice(id, data, showAlert = true) {
+                return dbRequest(INVOICES_STORE, 'readwrite', 'put', { id, data }).then(() => {
+                    if (showAlert) alert(`Invoice ${data.invoiceDetails.invoiceNo} saved successfully!`);
+                    loadInvoiceHistory();
+                    saveCustomerFromCurrentInvoice();
+                });
+            }
+            function loadInvoice(id) {
+                dbRequest(INVOICES_STORE, 'readonly', 'get', id).then(result => {
+                    if (result) {
+                        Object.assign(appState, result.data);
+                        renderUI();
+                    } else {
+                        alert('Invoice not found.');
+                    }
+                });
+            }
+            function loadLatestInvoice() {
+                const transaction = db.transaction(INVOICES_STORE, 'readonly');
+                const store = transaction.objectStore(INVOICES_STORE);
+                const cursorReq = store.openCursor(null, 'prev');
+                cursorReq.onsuccess = e => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        loadInvoice(cursor.value.id);
+                    }
+                    else {
+                        startNewInvoice().then(() => {
+                            document.getElementById('invoiceNo').value = appState.invoiceDetails.invoiceNo;
+                        });
+                    }
+                }
+                cursorReq.onerror = () => {
+                    startNewInvoice().then(() => {
+                        document.getElementById('invoiceNo').value = appState.invoiceDetails.invoiceNo;
+                    });
+                }
+            }
+            function loadInvoiceHistory() {
+                const select = document.getElementById('invoice-history');
+                select.innerHTML = '<option selected disabled>Load Invoice...</option>';
+                dbRequest(INVOICES_STORE, 'readonly', 'getAllKeys').then(keys => {
+                    keys.sort((a, b) => {
+                        const aParts = a.split('-');
+                        const bParts = b.split('-');
+                        const aDate = new Date(aParts[aParts.length - 1]);
+                        const bDate = new Date(bParts[bParts.length - 1]);
+                        if (aDate.getTime() !== bDate.getTime()) {
+                            return bDate.getTime() - aDate.getTime();
+                        }
+                        return bParts[1].localeCompare(aParts[1]);
+                    }).forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        const invNoParts = key.split('-');
+                        const actualInvNo = invNoParts.slice(1, invNoParts.length - 1).join('-');
+                        const invDate = invNoParts[invNoParts.length - 1];
+                        option.textContent = `Inv No: ${actualInvNo} - Date: ${invDate}`;
+                        select.appendChild(option);
+                    });
+                });
+            }
+            function saveCustomer(customerData, showAlert = true) {
+                if (!customerData.name) return;
+                dbRequest(CUSTOMERS_STORE, 'readwrite', 'put', customerData).then(() => {
+                    if (showAlert) console.log('Customer data saved:', customerData.name);
+                    loadCustomerHistory();
+                }).catch(e => console.error('Error saving customer:', e));
+            }
+            function loadCustomer(customerName) {
+                dbRequest(CUSTOMERS_STORE, 'readonly', 'get', customerName).then(customer => {
+                    if (customer) {
+                        appState.clientSupplier.customerName = customer.name || '';
+                        appState.clientSupplier.customerAddress = customer.address || '';
+                        appState.clientSupplier.customerPOBox = customer.poBox || '';
+                        appState.clientSupplier.customerTRN = customer.trn || '';
+                        renderUI();
+                    } else {
+                        console.log('Customer not found in history.');
+                    }
+                }).catch(e => console.error('Error loading customer:', e));
+            }
+            function loadCustomerHistory() {
+                const select = document.getElementById('customer-history');
+                select.innerHTML = '<option selected disabled>Load Customer...</option>';
+                dbRequest(CUSTOMERS_STORE, 'readonly', 'getAllKeys').then(keys => {
+                    keys.sort().forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = key;
+                        select.appendChild(option);
+                    });
+                });
+            }
+            function saveCustomerFromCurrentInvoice() {
+                const customerName = (appState.clientSupplier.customerName || '').trim();
+                if (customerName) {
+                    const customerData = {
+                        name: customerName,
+                        address: appState.clientSupplier.customerAddress,
+                        poBox: appState.clientSupplier.customerPOBox,
+                        trn: appState.clientSupplier.customerTRN
+                    };
+                    saveCustomer(customerData, false);
+                }
+            }
+            function addItem() {
+                const newIndex = appState.items.length;
+                appState.items.push({
+                    si: newIndex + 1,
+                    description: '',
+                    month: '',
+                    vehicle: '',
+                    uom: '',
+                    ratePerMonth: '',
+                    normalRate: '',
+                    overtimeRate: '',
+                    normalHour: '',
+                    overtimeHour: '',
+                    totalAmount: ''
+                });
+                renderInvoiceItems();
+            }
+            function deleteItem(rowIndex) {
+                if (appState.items.length <= 1) {
+                    alert('You must have at least one item.');
+                    return;
+                }
+                appState.items.splice(rowIndex, 1);
+                updateItemSerialNumbers();
+                renderInvoiceItems();
+                calculateTotals();
+            }
+            function updateItemSerialNumbers() {
+                appState.items.forEach((item, index) => {
+                    item.si = index + 1;
+                });
+            }
+            function handleImageUpload(event, previewId) {
+                const [file] = event.target.files;
+                if (file) {
+                    const reader = new FileReader();
+                    const preview = document.getElementById(previewId);
+                    reader.onload = (re) => {
+                        preview.src = re.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            function applySignatureImage(signatureUrl, imgElementId, inputElementId) {
+                const imgEl = document.getElementById(imgElementId);
+                const inputEl = document.getElementById(inputElementId);
+                if (signatureUrl && signatureUrl.startsWith('data:image')) {
+                    imgEl.src = signatureUrl;
+                    imgEl.style.display = 'block';
+                    if (inputEl) inputEl.style.display = 'none';
+                } else {
+                    imgEl.style.display = 'none';
+                    if (inputEl) inputEl.style.display = 'block';
+                }
+            }
+            function exportToImage() {
+                const printableArea = document.getElementById('printable-area');
+                const invoiceNo = (appState.invoiceDetails.invoiceNo || 'invoice').replace(/ /g, '_');
+                const invoiceDate = appState.invoiceDetails.invoiceDateDetail || 'date';
+                html2canvas(printableArea, { scale: 2, useCORS: true, logging: false }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `invoice_${invoiceNo}_${invoiceDate}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                });
+            }
+            async function backupAllData() {
+                try {
+                    const settingsPromise = dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config');
+                    const invoicesPromise = dbRequest(INVOICES_STORE, 'readonly', 'getAll');
+                    const customersPromise = dbRequest(CUSTOMERS_STORE, 'readonly', 'getAll');
+                    const [settings, invoices, customers] = await Promise.all([settingsPromise, invoicesPromise, customersPromise]);
+                    const backupData = { settings: settings || null, invoices: invoices || [], customers: customers || [] };
+                    const dataStr = JSON.stringify(backupData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const date = new Date().toISOString().slice(0, 10);
+                    link.download = `likelion_invoice_backup_${date}.json`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    alert('Backup successful!');
+                } catch (error) {
+                    console.error('Backup failed:', error);
+                    alert('Backup failed. See console for details.');
+                }
+            }
+            function restoreAllData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                if (!confirm('DANGER: This will ERASE all current data and replace it with the backup file. Are you absolutely sure?')) {
+                    event.target.value = null;
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        if (!backupData.settings || !Array.isArray(backupData.invoices) || !Array.isArray(backupData.customers)) {
+                            throw new Error('Invalid backup file format.');
+                        }
+                        const clearSettings = dbRequest(SETTINGS_STORE, 'readwrite', 'clear');
+                        const clearInvoices = dbRequest(INVOICES_STORE, 'readwrite', 'clear');
+                        const clearCustomers = dbRequest(CUSTOMERS_STORE, 'readwrite', 'clear');
+                        await Promise.all([clearSettings, clearInvoices, clearCustomers]);
+                        const settingsTx = db.transaction(SETTINGS_STORE, 'readwrite');
+                        if (backupData.settings) settingsTx.objectStore(SETTINGS_STORE).put(backupData.settings);
+                        const invoicesTx = db.transaction(INVOICES_STORE, 'readwrite');
+                        const invoicesStore = invoicesTx.objectStore(INVOICES_STORE);
+                        backupData.invoices.forEach(sheet => invoicesStore.put(sheet));
+                        const customersTx = db.transaction(CUSTOMERS_STORE, 'readwrite');
+                        const customersStore = customersTx.objectStore(CUSTOMERS_STORE);
+                        backupData.customers.forEach(customer => customersStore.put(customer));
+                        await Promise.all([
+                            new Promise(res => settingsTx.oncomplete = res),
+                            new Promise(res => invoicesTx.oncomplete = res),
+                            new Promise(res => customersTx.oncomplete = res)
+                        ]);
+                        alert('Restore successful! The application will now reload.');
+                        location.reload();
+                    } catch (error) {
+                        alert(`Restore failed: ${error.message}`);
+                        console.error(error);
+                    } finally {
+                        event.target.value = null;
+                    }
+                };
+                reader.readAsText(file);
+            }
+            document.getElementById('app').addEventListener('input', e => {
+                const { field, row } = e.target.dataset;
+                if (!field) return;
+                const value = e.target.value;
+                if (row !== undefined) {
+                    const rowIndex = parseInt(row, 10);
+                    if (!appState.items[rowIndex]) {
+                        appState.items[rowIndex] = { si: rowIndex + 1 };
+                    }
+                    appState.items[rowIndex][field] = value;
+                    if (['normalRate', 'overtimeRate', 'normalHour', 'overtimeHour'].includes(field)) {
+                        calculateRowTotal(rowIndex);
+                    }
+                } else if (appState.header.hasOwnProperty(field)) {
+                    appState.header[field] = value;
+                } else if (appState.clientSupplier.hasOwnProperty(field)) {
+                    appState.clientSupplier[field] = value;
+                } else if (appState.invoiceDetails.hasOwnProperty(field)) {
+                    appState.invoiceDetails[field] = value;
+                } else if (appState.footer.hasOwnProperty(field)) {
+                    appState.footer[field] = value;
+                }
+            });
+            document.getElementById('invoice-items-body').addEventListener('click', e => {
+                if (e.target.classList.contains('delete-item-btn') || e.target.closest('.delete-item-btn')) {
+                    const btn = e.target.closest('.delete-item-btn');
+                    const rowIndex = parseInt(btn.dataset.row, 10);
+                    deleteItem(rowIndex);
+                }
+            });
+            document.getElementById('save-settings-btn').addEventListener('click', () => {
+                const newSettings = {
+                    companyNameAR: document.getElementById('settingsCompanyNameAR').value.trim(),
+                    companyNameEN: document.getElementById('settingsCompanyNameEN').value.trim(),
+                    companyAddress: document.getElementById('settingsCompanyAddress').value.trim(),
+                    companyPOBox: document.getElementById('settingsCompanyPOBox').value.trim(),
+                    companyTRN: document.getElementById('settingsCompanyTRN').value.trim(),
+                    companyMobile: document.getElementById('settingsCompanyMobile').value.trim(),
+                    companyEmail: document.getElementById('settingsCompanyEmail').value.trim(),
+                    vatRate: parseFloat(document.getElementById('settingsVatRate').value) || 0,
+                    companyLogo: document.getElementById('logoPreview').src.startsWith('data:image') ? document.getElementById('logoPreview').src : '',
+                    companyStamp: document.getElementById('stampPreview').src.startsWith('data:image') ? document.getElementById('stampPreview').src : '',
+                    authorizedSignature: document.getElementById('authSigPreview').src.startsWith('data:image') ? document.getElementById('authSigPreview').src : '',
+                    receiverSignature: document.getElementById('recSigPreview').src.startsWith('data:image') ? document.getElementById('recSigPreview').src : ''
+                };
+                saveSettings(newSettings);
+            });
+            document.getElementById('save-invoice-btn').addEventListener('click', () => {
+                const invoiceId = generateInvoiceIdFromState();
+                if (!invoiceId) {
+                    alert('Please ensure Invoice No and Invoice Date are set.');
+                    return;
+                }
+                saveInvoice(invoiceId, appState);
+            });
+            document.getElementById('settingsCompanyLogo').addEventListener('change', e => handleImageUpload(e, 'logoPreview'));
+            document.getElementById('settingsCompanyStamp').addEventListener('change', e => handleImageUpload(e, 'stampPreview'));
+            document.getElementById('settingsAuthorizedSignature').addEventListener('change', e => handleImageUpload(e, 'authSigPreview'));
+            document.getElementById('settingsReceiverSignature').addEventListener('change', e => handleImageUpload(e, 'recSigPreview'));
+            document.getElementById('new-invoice-btn').addEventListener('click', startNewInvoice);
+            document.getElementById('export-image-btn').addEventListener('click', exportToImage);
+            document.getElementById('invoice-history').addEventListener('change', e => e.target.value && loadInvoice(e.target.value));
+            document.getElementById('customer-history').addEventListener('change', e => e.target.value && loadCustomer(e.target.value));
+            document.getElementById('add-item-btn').addEventListener('click', addItem);
+            document.getElementById('backup-all-btn').addEventListener('click', backupAllData);
+            document.getElementById('restore-all-btn').addEventListener('click', () => document.getElementById('restore-file-input').click());
+            document.getElementById('restore-file-input').addEventListener('change', restoreAllData);
+            initDB();
+        });
+    </script>
+</body>
+
+</html>

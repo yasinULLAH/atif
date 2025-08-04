@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Advanced digital time sheet with admin controls, high-quality image export, full data backup/restore, and unique record history per driver.">
+    <meta name="keywords"
+        content="timesheet, driver timesheet, unique record, image export, data backup, json restore, admin panel, work log, transport, maintenance, Pakistan">
+    <meta name="author" content="Yasin Ullah, Pakistan">
+    <title>Advanced Digital Time Sheet</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --border-color: #dee2e6;
+            --header-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9ecef;
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .printable-area {
+            padding: 2rem;
+        }
+
+        .sheet-header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+        }
+
+        .header-logo {
+            max-width: 150px;
+            max-height: 70px;
+            justify-self: start;
+        }
+
+        .company-title-block h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+
+        .company-title-block h2 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            border: 1px solid var(--primary-color);
+            display: inline-block;
+            padding: 0.25rem 1rem;
+        }
+
+        .contact-info {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: right;
+            justify-self: end;
+            line-height: 1.5;
+        }
+
+        .info-grid,
+        .summary-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .info-field label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .info-field input,
+        .info-field select {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .info-field input:focus,
+        .info-field select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .timesheet-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .timesheet-table th,
+        .timesheet-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.6rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .timesheet-table thead {
+            background-color: var(--header-bg);
+            font-weight: 700;
+        }
+
+        .timesheet-table input {
+            width: 100%;
+            border: none;
+            text-align: center;
+            background-color: transparent;
+            padding: 0.25rem;
+        }
+
+        .timesheet-table input:focus {
+            outline: 1px solid var(--primary-color);
+            background-color: #f0f8ff;
+        }
+
+        .timesheet-table input[type="number"]::-webkit-inner-spin-button,
+        .timesheet-table input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .timesheet-table input[readonly] {
+            font-weight: 500;
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .actions-bar {
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .actions-bar .btn,
+        .actions-bar .form-select {
+            min-width: 150px;
+        }
+
+        .footer-signature {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+
+        #restore-file-input {
+            display: none;
+        }
+
+        .logo-preview {
+            max-width: 200px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            padding: 5px;
+        }
+
+        .no-print {
+            /* This class will be hidden during printing/export */
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+            }
+
+            .no-print,
+            .modal,
+            .modal-backdrop {
+                display: none !important;
+            }
+
+            .main-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .printable-area {
+                padding: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .printable-area {
+                padding: 1rem;
+            }
+
+            .sheet-header {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .header-logo,
+            .contact-info {
+                justify-self: center;
+                text-align: center;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main-container" id="app">
+        <div class="actions-bar no-print">
+            <div class="d-flex flex-wrap gap-2">
+                <button id="new-sheet-btn" class="btn btn-primary"><i class="fas fa-file-alt me-1"></i> New
+                    Sheet</button>
+                <button id="save-sheet-btn" class="btn btn-success"><i class="fas fa-save me-1"></i>
+                    Save/Finalize</button>
+                <select id="record-history" class="form-select" style="width: auto;">
+                    <option selected>Load Record...</option>
+                </select>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button id="export-image-btn" class="btn btn-info"><i class="fas fa-file-image me-1"></i> Export
+                    Image</button>
+                <button id="settings-btn" class="btn btn-secondary" data-bs-toggle="modal"
+                    data-bs-target="#settingsModal"><i class="fas fa-cog me-1"></i> Settings</button>
+            </div>
+        </div>
+
+        <div class="printable-area" id="printable-area">
+            <header class="sheet-header">
+                <img src="" alt="Company Logo" id="header-logo" class="header-logo" style="display: none;">
+                <div class="company-title-block">
+                    <h1 id="companyNameDisplay">LIKE LION GENERAL TRANSPORT & MAINTENANCE</h1>
+                    <h2>TIME SHEET</h2>
+                </div>
+                <div class="contact-info">
+                    <div id="mobileDisplay"><strong>Mobile No:</strong> 0553237349</div>
+                    <div id="emailDisplay"><strong>Email:</strong> likeliongeneral2021@gmail.com</div>
+                </div>
+            </header>
+
+            <section class="info-grid">
+                <div class="info-field">
+                    <label for="driverName">Driver Name</label>
+                    <input type="text" id="driverName" class="form-control" data-field="driverName">
+                </div>
+                <div class="info-field">
+                    <label for="vehicleNo">Vehicle No</label>
+                    <input type="text" id="vehicleNo" class="form-control" data-field="vehicleNo">
+                </div>
+                <div class="info-field">
+                    <label for="vehicleType">Type of Vehicle</label>
+                    <input type="text" id="vehicleType" class="form-control" data-field="vehicleType">
+                </div>
+                <div class="info-field">
+                    <label for="siteName">Site Name</label>
+                    <input type="text" id="siteName" class="form-control" data-field="siteName">
+                </div>
+                <div class="info-field">
+                    <label for="monthYear">Timesheet for Month</label>
+                    <input type="month" id="monthYear" class="form-control" data-field="monthYear">
+                </div>
+            </section>
+
+            <section class="table-responsive">
+                <table class="timesheet-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">Date</th>
+                            <th style="width: 15%;">In Time</th>
+                            <th style="width: 15%;">Out Time</th>
+                            <th style="width: 10%;">Lunch (mins)</th>
+                            <th style="width: 15%;">Normal Hrs</th>
+                            <th style="width: 15%;">Normal O.T Hrs</th>
+                            <th style="width: 25%;">Signature</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timesheet-body"></tbody>
+                </table>
+            </section>
+
+            <footer class="summary-grid mt-4">
+                <div class="info-field">
+                    <label for="totalWorkingHrs">Total Working Hrs</label>
+                    <input type="text" id="totalWorkingHrs" class="form-control" data-field="totalWorkingHrs" readonly>
+                </div>
+                <div class="info-field">
+                    <label for="totalOTHrs">Total O.T Hrs</label>
+                    <input type="text" id="totalOTHrs" class="form-control" data-field="totalOTHrs" readonly>
+                </div>
+                <div class="info-field">
+                    <label for="monthlyRate">Monthly Rate Hrs</label>
+                    <input type="number" id="monthlyRate" class="form-control" data-field="monthlyRate"
+                        placeholder="Enter rate">
+
+                    <label for="totalEarning" class="mt-2">Total Earning</label>
+                    <input type="text" id="totalEarning" class="form-control" readonly>
+                </div>
+                <div class="info-field footer-signature">
+                    <label for="footerSignature">Signature</label>
+                    <input type="text" id="footerSignature" class="form-control signature-input"
+                        data-field="footerSignature">
+                    <img id="footerSignatureImg" class="signature-image"
+                        style="display:none; max-height:50px; margin-top:5px;" />
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <div class="modal fade no-print" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Admin Panel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="settingsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="company-info-tab" data-bs-toggle="tab"
+                                data-bs-target="#company-info" type="button" role="tab" aria-controls="company-info"
+                                aria-selected="true">Company Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="data-management-tab" data-bs-toggle="tab"
+                                data-bs-target="#data-management" type="button" role="tab"
+                                aria-controls="data-management" aria-selected="false">Backup & Restore</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="settingsTabContent">
+                        <div class="tab-pane fade show active" id="company-info" role="tabpanel"
+                            aria-labelledby="company-info-tab" style="padding-top: 1.5rem;">
+                            <div class="mb-3">
+                                <label for="settingsCompanyName" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="settingsCompanyName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsMobile" class="form-label">Mobile No</label>
+                                <input type="text" class="form-control" id="settingsMobile">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="settingsEmail">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsLogo" class="form-label">Company Logo</label>
+                                <input class="form-control" type="file" id="settingsLogo" accept="image/*">
+                                <img id="logoPreview" src="#" alt="Logo Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingsSignature" class="form-label">Signature Image</label>
+                                <input class="form-control" type="file" id="settingsSignature" accept="image/*">
+                                <img id="signaturePreview" src="#" alt="Signature Preview" class="logo-preview"
+                                    style="display: none;" />
+                            </div>
+                            <div class="mt-4 d-flex justify-content-end">
+                                <button type="button" id="save-settings-btn" class="btn btn-primary">Save Company
+                                    Info</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="data-management" role="tabpanel"
+                            aria-labelledby="data-management-tab" style="padding-top: 1.5rem;">
+                            <p>Create a full backup of all settings and timesheet records, or restore the application
+                                from a backup file.</p>
+                            <div class="d-grid gap-2 col-md-8 mx-auto">
+                                <button id="backup-all-btn" class="btn btn-success"><i
+                                        class="fas fa-download me-2"></i>Backup All Data</button>
+                                <button id="restore-all-btn" class="btn btn-danger"><i
+                                        class="fas fa-upload me-2"></i>Restore from Backup</button>
+                                <input type="file" id="restore-file-input" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DB_NAME = 'AdvancedTimesheetDB_YasinUllah_V3';
+            const DB_VERSION = 1;
+            const SETTINGS_STORE = 'appSettings';
+            const TIMESHEETS_STORE = 'archivedTimesheets';
+            const STANDARD_WORK_HOURS = 8;
+            let db;
+            const appState = { header: {}, rows: [], footer: {} };
+
+            // --- Database & Initialization ---
+            function initDB() {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains(SETTINGS_STORE)) db.createObjectStore(SETTINGS_STORE, { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains(TIMESHEETS_STORE)) db.createObjectStore(TIMESHEETS_STORE, { keyPath: 'id' });
+                };
+                request.onsuccess = e => {
+                    db = e.target.result;
+                    loadSettings().then(settingsExist => {
+                        loadRecordHistory();
+                        if (settingsExist) {
+                            loadLatestTimesheet();
+                        } else {
+                            createSampleData();
+                        }
+                    });
+                };
+                request.onerror = e => console.error('Database error:', e.target.errorCode);
+            }
+
+            function createSampleData() {
+                const defaultSettings = {
+                    companyName: 'LIKE LION GENERAL TRANSPORT & MAINTENANCE', mobile: '0553237349', email: 'likeliongeneral2021@gmail.com', logo: ''
+                };
+                const defaultTimesheet = {
+                    header: { driverName: 'Zubair Ahmed', vehicleNo: 'GLT-451', vehicleType: 'Toyota Hilux', siteName: 'Bannu Construction Site', monthYear: '2025-08' },
+                    rows: [
+                        { date: 1, inTime: '08:00', outTime: '18:00', lunch: '60', normalHrs: '8.00', otHrs: '1.00', signature: 'Z. Ahmed' },
+                        { date: 2, inTime: '08:05', outTime: '17:00', lunch: '60', normalHrs: '8.00', otHrs: '0.00', signature: 'Z. Ahmed' },
+                        { date: 3, inTime: '07:55', outTime: '19:30', lunch: '45', normalHrs: '8.00', otHrs: '2.75', signature: 'Z. Ahmed' },
+                        { date: 4, inTime: '08:00', outTime: '17:30', lunch: '30', normalHrs: '8.00', otHrs: '1.00', signature: 'Z. Ahmed' },
+                        ...Array.from({ length: 27 }, (_, i) => ({ date: i + 5, inTime: '', outTime: '', lunch: '', normalHrs: '', otHrs: '', signature: '' }))
+                    ],
+                    footer: { totalWorkingHrs: '32.00', totalOTHrs: '4.75', monthlyRate: '25000', footerSignature: 'Zubair Ahmed' }
+                };
+                saveSettings(defaultSettings, false);
+                const sampleId = "2025-08_zubair-ahmed";
+                saveTimesheet(sampleId, defaultTimesheet, false).then(() => {
+                    location.reload();
+                });
+            }
+            document.getElementById('settingsSignature').addEventListener('change', e => {
+                const [file] = e.target.files;
+                if (file) {
+                    const reader = new FileReader();
+                    const preview = document.getElementById('signaturePreview');
+                    reader.onload = (re) => {
+                        preview.src = re.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            // --- UI Rendering & State Management ---
+            function renderUI() {
+                Object.keys(appState.header).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = appState.header[key];
+                });
+                const tbody = document.getElementById('timesheet-body');
+                tbody.innerHTML = '';
+                const rows = appState.rows || [];
+                rows.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row.date}</td>
+                        <td><input type="time" class="form-control-sm" data-row="${index}" data-field="inTime" value="${row.inTime || ''}"></td>
+                        <td><input type="time" class="form-control-sm" data-row="${index}" data-field="outTime" value="${row.outTime || ''}"></td>
+                        <td><input type="number" class="form-control-sm" min="0" data-row="${index}" data-field="lunch" value="${row.lunch || ''}" placeholder="mins"></td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="normalHrs" value="${row.normalHrs || ''}" readonly></td>
+                        <td><input type="text" class="form-control-sm" data-row="${index}" data-field="otHrs" value="${row.otHrs || ''}" readonly></td>
+                        <td>
+    <input type="text" class="form-control-sm signature-input" data-row="${index}" data-field="signature" value="${row.signature || ''}">
+    <img class="signature-image" style="display:none; max-height:40px;"/>
+</td>`;
+                    tbody.appendChild(tr);
+                });
+                Object.keys(appState.footer).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = appState.footer[key];
+                });
+                calculateAllTotals();
+                dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config').then(settings => {
+                    const signatureUrl = (settings && settings.data.signatureImage) ? settings.data.signatureImage : null;
+                    applySignatureImage(signatureUrl);
+                });
+            }
+
+            function updateUISettings(settingsData) {
+                document.getElementById('companyNameDisplay').textContent = settingsData.companyName;
+                document.getElementById('mobileDisplay').innerHTML = `<strong>Mobile No:</strong> ${settingsData.mobile}`;
+                document.getElementById('emailDisplay').innerHTML = `<strong>Email:</strong> ${settingsData.email}`;
+                const logoEl = document.getElementById('header-logo');
+                logoEl.style.display = settingsData.logo ? 'block' : 'none';
+                logoEl.src = settingsData.logo || '';
+                document.getElementById('settingsCompanyName').value = settingsData.companyName;
+                document.getElementById('settingsMobile').value = settingsData.mobile;
+                document.getElementById('settingsEmail').value = settingsData.email;
+                const logoPreview = document.getElementById('logoPreview');
+                logoPreview.style.display = settingsData.logo ? 'block' : 'none';
+                logoPreview.src = settingsData.logo || '';
+                const signaturePreview = document.getElementById('signaturePreview');
+                signaturePreview.style.display = settingsData.signatureImage ? 'block' : 'none';
+                signaturePreview.src = settingsData.signatureImage || '';
+                applySignatureImage(settingsData.signatureImage);
+            }
+
+            function startNewSheet() {
+                Object.assign(appState, {
+                    header: { driverName: '', vehicleNo: '', vehicleType: '', siteName: '', monthYear: new Date().toISOString().slice(0, 7) },
+                    rows: Array.from({ length: 31 }, (_, i) => ({ date: i + 1, inTime: '', outTime: '', lunch: '', normalHrs: '', otHrs: '', signature: '' })),
+                    footer: { totalWorkingHrs: '', totalOTHrs: '', monthlyRate: '', footerSignature: '' }
+                });
+                renderUI();
+            }
+
+            // --- Calculations ---
+            function calculateRowHours(rowIndex) {
+                const row = appState.rows[rowIndex];
+                if (!row.inTime || !row.outTime) {
+                    row.normalHrs = ''; row.otHrs = '';
+                } else {
+                    let diffMs = new Date(`1970-01-01T${row.outTime}`) - new Date(`1970-01-01T${row.inTime}`);
+                    if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000;
+                    const totalWorkHours = (diffMs / 3600000) - ((parseInt(row.lunch, 10) || 0) / 60);
+                    if (totalWorkHours < 0) { row.normalHrs = '0.00'; row.otHrs = '0.00'; }
+                    else {
+                        row.normalHrs = Math.min(totalWorkHours, STANDARD_WORK_HOURS).toFixed(2);
+                        row.otHrs = Math.max(0, totalWorkHours - STANDARD_WORK_HOURS).toFixed(2);
+                    }
+                }
+                document.querySelector(`input[data-row="${rowIndex}"][data-field="normalHrs"]`).value = row.normalHrs;
+                document.querySelector(`input[data-row="${rowIndex}"][data-field="otHrs"]`).value = row.otHrs;
+                calculateAllTotals();
+            }
+
+            function calculateAllTotals() {
+                const rows = appState.rows || [];
+                const totalWorkingHrs = rows.reduce((s, r) => s + (parseFloat(r.normalHrs) || 0), 0);
+                const totalOTHrs = rows.reduce((s, r) => s + (parseFloat(r.otHrs) || 0), 0);
+
+                if (appState.footer) {
+                    appState.footer.totalWorkingHrs = totalWorkingHrs.toFixed(2);
+                    appState.footer.totalOTHrs = totalOTHrs.toFixed(2);
+                    document.getElementById('totalWorkingHrs').value = appState.footer.totalWorkingHrs;
+                    document.getElementById('totalOTHrs').value = appState.footer.totalOTHrs;
+                }
+
+                const monthlyRate = parseFloat(document.getElementById('monthlyRate').value) || 0;
+                const totalEarning = (totalWorkingHrs + totalOTHrs) * monthlyRate;
+                document.getElementById('totalEarning').value = totalEarning.toFixed(2);
+            }
+
+            // --- Data Persistence (IndexedDB) & Helpers ---
+            function generateSheetId() {
+                const monthYear = appState.header.monthYear;
+                const driverName = appState.header.driverName;
+                if (!monthYear || !driverName.trim()) return null;
+                const formattedDriver = driverName.trim().toLowerCase().replace(/\s+/g, '-');
+                return `${monthYear}_${formattedDriver}`;
+            }
+
+            function dbRequest(storeName, mode, action, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(storeName, mode);
+                    const store = transaction.objectStore(storeName);
+                    const request = store[action](data);
+                    transaction.oncomplete = () => resolve(request.result);
+                    transaction.onerror = () => reject(transaction.error);
+                });
+            }
+
+            function saveSettings(settingsData, showAlert = true) {
+                dbRequest(SETTINGS_STORE, 'readwrite', 'put', { id: 'config', data: settingsData }).then(() => {
+                    updateUISettings(settingsData);
+                    if (showAlert) {
+                        const modalEl = document.getElementById('settingsModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        alert('Settings saved successfully!');
+                    }
+                });
+            }
+
+            function loadSettings() {
+                return dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config').then(settings => {
+                    if (settings) {
+                        updateUISettings(settings.data);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+
+            function saveTimesheet(id, data, showAlert = true) {
+                return dbRequest(TIMESHEETS_STORE, 'readwrite', 'put', { id, data }).then(() => {
+                    if (showAlert) alert(`Timesheet for ${data.header.driverName} (${data.header.monthYear}) saved successfully!`);
+                    loadRecordHistory();
+                });
+            }
+
+            function loadTimesheet(id) {
+                dbRequest(TIMESHEETS_STORE, 'readonly', 'get', id).then(result => {
+                    Object.assign(appState, result.data);
+                    renderUI();
+                });
+            }
+
+            function loadLatestTimesheet() {
+                const transaction = db.transaction(TIMESHEETS_STORE, 'readonly');
+                const store = transaction.objectStore(TIMESHEETS_STORE);
+                const cursorReq = store.openCursor(null, 'prev');
+                cursorReq.onsuccess = e => {
+                    const cursor = e.target.result;
+                    if (cursor) loadTimesheet(cursor.value.id);
+                    else startNewSheet();
+                }
+                cursorReq.onerror = () => startNewSheet();
+            }
+
+            function loadRecordHistory() {
+                const select = document.getElementById('record-history');
+                select.innerHTML = '<option selected disabled>Load Record...</option>';
+                dbRequest(TIMESHEETS_STORE, 'readonly', 'getAllKeys').then(keys => {
+                    keys.sort().reverse().forEach(key => {
+                        const [ym, driver] = key.split('_');
+                        const date = new Date(ym + '-02'); // Use day 02 to avoid timezone issues
+                        const month = date.toLocaleString('default', { month: 'short' });
+                        const year = date.getFullYear();
+                        const driverFormatted = driver.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${month} ${year} - ${driverFormatted}`;
+                        select.appendChild(option);
+                    });
+                });
+            }
+
+            // --- Export, Backup & Restore ---
+            function exportToImage() {
+                const printableArea = document.getElementById('printable-area');
+                const driverName = (appState.header.driverName || 'timesheet').replace(/ /g, '_');
+                const month = appState.header.monthYear || 'data';
+
+                html2canvas(printableArea, { scale: 3, useCORS: true, logging: false }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `timesheet_${driverName}_${month}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                });
+            }
+            function applySignatureImage(signatureUrl) {
+                const signatureInputs = document.querySelectorAll('.signature-input');
+                const signatureImages = document.querySelectorAll('.signature-image');
+
+                if (signatureUrl && signatureUrl.startsWith('data:image')) {
+                    signatureImages.forEach(img => {
+                        img.src = signatureUrl;
+                        img.style.display = 'block';
+                    });
+                    signatureInputs.forEach(input => input.style.display = 'none');
+                } else {
+                    signatureImages.forEach(img => img.style.display = 'none');
+                    signatureInputs.forEach(input => input.style.display = 'block');
+                }
+            }
+
+
+            // Re-adding unchanged backup/restore functions
+            async function backupAllData() {
+                try {
+                    const settingsPromise = dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config');
+                    const timesheetsPromise = dbRequest(TIMESHEETS_STORE, 'readonly', 'getAll');
+                    const [settings, timesheets] = await Promise.all([settingsPromise, timesheetsPromise]);
+
+                    const backupData = { settings: settings || null, timesheets: timesheets || [] };
+                    const dataStr = JSON.stringify(backupData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const date = new Date().toISOString().slice(0, 10);
+                    link.download = `timesheet_full_backup_${date}.json`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    alert('Backup successful!');
+                } catch (error) {
+                    console.error('Backup failed:', error);
+                    alert('Backup failed. See console for details.');
+                }
+            }
+
+            function restoreAllData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!confirm('DANGER: This will ERASE all current data and replace it with the backup file. Are you absolutely sure?')) {
+                    event.target.value = null; // Reset file input
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        if (!backupData.settings || !Array.isArray(backupData.timesheets)) {
+                            throw new Error('Invalid backup file format.');
+                        }
+
+                        const clearSettings = dbRequest(SETTINGS_STORE, 'readwrite', 'clear');
+                        const clearTimesheets = dbRequest(TIMESHEETS_STORE, 'readwrite', 'clear');
+                        await Promise.all([clearSettings, clearTimesheets]);
+
+                        const settingsTx = db.transaction(SETTINGS_STORE, 'readwrite');
+                        settingsTx.objectStore(SETTINGS_STORE).put(backupData.settings);
+
+                        const timesheetsTx = db.transaction(TIMESHEETS_STORE, 'readwrite');
+                        const timesheetsStore = timesheetsTx.objectStore(TIMESHEETS_STORE);
+                        backupData.timesheets.forEach(sheet => timesheetsStore.put(sheet));
+
+                        await Promise.all([
+                            new Promise(res => settingsTx.oncomplete = res),
+                            new Promise(res => timesheetsTx.oncomplete = res)
+                        ]);
+
+                        alert('Restore successful! The application will now reload.');
+                        location.reload();
+
+                    } catch (error) {
+                        alert(`Restore failed: ${error.message}`);
+                        console.error(error);
+                    } finally {
+                        event.target.value = null; // Reset file input
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // --- Event Listeners ---
+            document.getElementById('app').addEventListener('input', e => {
+                const { field, row } = e.target.dataset;
+                if (!field) return;
+                const value = e.target.value;
+                if (row) {
+                    const rowIndex = parseInt(row, 10);
+                    appState.rows[rowIndex][field] = value;
+                    if (['inTime', 'outTime', 'lunch'].includes(field)) calculateRowHours(rowIndex);
+                } else if (appState.header.hasOwnProperty(field)) {
+                    appState.header[field] = value;
+                } else if (appState.footer.hasOwnProperty(field)) {
+                    appState.footer[field] = value;
+                    if (field === 'monthlyRate') {
+                        calculateAllTotals();
+                    }
+                }
+            });
+
+            document.getElementById('save-settings-btn').addEventListener('click', () => {
+                const newSettings = {
+                    companyName: document.getElementById('settingsCompanyName').value.trim(),
+                    mobile: document.getElementById('settingsMobile').value.trim(),
+                    email: document.getElementById('settingsEmail').value.trim(),
+                    logo: document.getElementById('logoPreview').src.startsWith('data:image') ? document.getElementById('logoPreview').src : '',
+                    signatureImage: document.getElementById('signaturePreview').src.startsWith('data:image') ? document.getElementById('signaturePreview').src : ''
+                };
+                saveSettings(newSettings);
+            });
+
+            document.getElementById('save-sheet-btn').addEventListener('click', () => {
+                const sheetId = generateSheetId();
+                if (!sheetId) {
+                    alert('Please enter a Driver Name and select a Month before saving.');
+                    return;
+                }
+                saveTimesheet(sheetId, appState);
+            });
+
+            document.getElementById('settingsLogo').addEventListener('change', e => {
+                const [file] = e.target.files;
+                if (file) {
+                    const reader = new FileReader();
+                    const preview = document.getElementById('logoPreview');
+                    reader.onload = (re) => {
+                        preview.src = re.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('new-sheet-btn').addEventListener('click', startNewSheet);
+            document.getElementById('export-image-btn').addEventListener('click', exportToImage);
+            document.getElementById('record-history').addEventListener('change', e => e.target.value && loadTimesheet(e.target.value));
+            document.getElementById('backup-all-btn').addEventListener('click', backupAllData);
+            document.getElementById('restore-all-btn').addEventListener('click', () => document.getElementById('restore-file-input').click());
+            document.getElementById('restore-file-input').addEventListener('change', restoreAllData);
+
+            initDB();
+        });
+    </script>
+</body>
+
+</html>

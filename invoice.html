@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Invoice generator app based on Like Lion Transport invoice.">
+    <meta name="author" content="Yasin Ullah, Pakistan">
+    <title>Invoice Generator</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --border-color: #dee2e6;
+            --primary-text: #212529;
+            --secondary-text: #6c757d;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .main-container {
+            max-width: 850px;
+            margin: 1.5rem auto;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .actions-bar {
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .printable-area {
+            padding: 2.5rem;
+            color: var(--primary-text);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--primary-text);
+            padding-bottom: 1rem;
+        }
+        
+        .header-logo { max-width: 100px; }
+        .header-title { text-align: center; }
+        .header-title h1 { font-size: 1.5rem; font-weight: bold; margin: 0; }
+        .header-title h2 { font-size: 1.2rem; margin: 0.5rem 0; }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .info-block { border: 1px solid var(--border-color); padding: 1rem; }
+        .info-block strong { display: block; margin-bottom: 0.5rem; }
+
+        .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+        .invoice-table th, .invoice-table td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: center; }
+        .invoice-table th { background-color: #f8f9fa; font-weight: bold; }
+        .invoice-table .text-left { text-align: left; }
+
+        .summary-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .amount-in-words { max-width: 60%; }
+        .summary-table { width: 35%; border-collapse: collapse; }
+        .summary-table td { border: 1px solid var(--border-color); padding: 0.5rem; }
+        .summary-table .total { font-weight: bold; }
+
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-stamp { max-width: 150px; }
+        .footer-contact { text-align: right; }
+
+        /* General element styles */
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            border: 1px dashed var(--border-color);
+            padding: 4px;
+            font-size: inherit;
+            font-family: inherit;
+        }
+        textarea:focus, input:focus { outline: 1px solid #86b7fe; }
+        textarea { resize: vertical; }
+
+        .delete-row-btn { cursor: pointer; color: #dc3545; }
+        .logo-preview { max-width: 200px; margin-top: 10px; border: 1px solid var(--border-color); padding: 5px; }
+
+        @media print {
+            body { background-color: #fff; }
+            .no-print, .modal, .modal-backdrop { display: none !important; }
+            .main-container { box-shadow: none; border: none; margin: 0; max-width: 100%; }
+            textarea, input { border: none !important; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main-container" id="app">
+        <div class="actions-bar no-print">
+            <div class="d-flex flex-wrap gap-2">
+                <button id="new-btn" class="btn btn-primary"><i class="fas fa-file me-1"></i> New Invoice</button>
+                <button id="save-btn" class="btn btn-success"><i class="fas fa-save me-1"></i> Save Invoice</button>
+                <select id="record-history" class="form-select" style="width: auto;">
+                    <option selected>Load Invoice...</option>
+                </select>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button id="export-image-btn" class="btn btn-info"><i class="fas fa-file-image me-1"></i> Export Image</button>
+                <button id="settings-btn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="fas fa-cog me-1"></i> Settings</button>
+            </div>
+        </div>
+
+        <div class="printable-area" id="printable-area">
+            <header class="invoice-header">
+                <img src="" alt="Company Logo" id="header-logo-left" class="header-logo">
+                <div class="header-title">
+                    <h1 id="companyNameDisplay">LIKE LION GENERAL TRANSPORT & MAINTENANCE</h1>
+                    <h2>TAX INVOICE</h2>
+                </div>
+                <img src="" alt="Company Logo" id="header-logo-right" class="header-logo">
+            </header>
+
+            <div class="info-grid">
+                <div class="info-block">
+                    <strong>Bill To:</strong>
+                    <textarea data-field="customerInfo" rows="4" placeholder="Enter Customer Name and Address..."></textarea>
+                    <strong>TRN:</strong> <input type="text" data-field="customerTrn" placeholder="Customer TRN">
+                </div>
+                <div class="info-block">
+                    <strong>Invoice No:</strong> <input type="text" data-field="invoiceNo" placeholder="e.g., 343">
+                    <strong>Invoice Date:</strong> <input type="text" data-field="invoiceDate" placeholder="e.g., 15/07/2025">
+                    <strong>Order No:</strong> <input type="text" data-field="orderNo" placeholder="e.g., 1001461637">
+                    <strong>Period:</strong> <input type="text" data-field="period" placeholder="e.g., June-25">
+                </div>
+            </div>
+
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th style="width:5%">Sl</th>
+                        <th style="width:30%">Item Description</th>
+                        <th>Hours</th>
+                        <th>Rate</th>
+                        <th style="width:15%">Total</th>
+                        <th style="width:5%"></th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-tbody">
+                    </tbody>
+            </table>
+            <button id="add-row-btn" class="btn btn-primary btn-sm no-print mb-3"><i class="fas fa-plus me-1"></i> Add Item</button>
+
+            <div class="summary-section">
+                <div class="amount-in-words">
+                    <strong>Amount in words:</strong><br>
+                    <span id="amount-in-words-display"></span>
+                </div>
+                <table class="summary-table">
+                    <tbody>
+                        <tr>
+                            <td>Basic Amount</td>
+                            <td id="basic-amount">0.00</td>
+                        </tr>
+                        <tr>
+                            <td>VAT (<span id="vat-rate-display">5</span>%)</td>
+                            <td id="vat-amount">0.00</td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total Amount</td>
+                            <td id="total-amount">0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="footer-section">
+                <div>
+                    <strong>Authorized Sig</strong>
+                </div>
+                <img src="" alt="Company Stamp" id="footer-stamp" class="footer-stamp">
+                <div>
+                    <strong>Receiver Sig</strong>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <div class="modal fade no-print" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" class="form-control" id="settingsCompanyName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">VAT Rate (%)</label>
+                        <input type="number" class="form-control" id="settingsVatRate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Company Logo</label>
+                        <input class="form-control" type="file" id="settingsLogo" accept="image/*">
+                        <img id="logoPreview" src="#" alt="Logo Preview" class="logo-preview" style="display: none;" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Company Stamp</label>
+                        <input class="form-control" type="file" id="settingsStamp" accept="image/*">
+                        <img id="stampPreview" src="#" alt="Stamp Preview" class="logo-preview" style="display: none;" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="save-settings-btn" class="btn btn-primary">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DB_NAME = 'InvoiceGeneratorDB_V1';
+            const DB_VERSION = 1;
+            const SETTINGS_STORE = 'settings';
+            const INVOICES_STORE = 'invoices';
+            let db;
+
+            const appState = {
+                invoiceNo: '',
+                invoiceDate: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
+                orderNo: '',
+                period: '',
+                customerInfo: '',
+                customerTrn: '',
+                items: [{ description: '', hours: 0, rate: 0 }],
+                vatRate: 5
+            };
+
+            // --- Database Functions ---
+            function initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onupgradeneeded = e => {
+                        db = e.target.result;
+                        if (!db.objectStoreNames.contains(SETTINGS_STORE)) db.createObjectStore(SETTINGS_STORE, { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains(INVOICES_STORE)) db.createObjectStore(INVOICES_STORE, { keyPath: 'id' });
+                    };
+                    request.onsuccess = e => {
+                        db = e.target.result;
+                        resolve(db);
+                    };
+                    request.onerror = e => reject('Database error: ' + e.target.errorCode);
+                });
+            }
+
+            function dbRequest(storeName, mode, action, data) {
+                return new Promise((resolve, reject) => {
+                    if (!db) { reject("DB not initialized"); return; }
+                    const transaction = db.transaction(storeName, mode);
+                    const store = transaction.objectStore(storeName);
+                    const request = data ? store[action](data) : store[action]();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(transaction.error);
+                });
+            }
+
+            // --- State and UI Rendering ---
+            function render() {
+                // Render main fields
+                Object.keys(appState).forEach(key => {
+                    const el = document.querySelector(`[data-field="${key}"]`);
+                    if (el) el.value = appState[key];
+                });
+
+                // Render table rows
+                const tbody = document.getElementById('invoice-tbody');
+                tbody.innerHTML = '';
+                appState.items.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td class="text-left"><textarea data-item-field="description" data-index="${index}" rows="1">${item.description}</textarea></td>
+                        <td><input type="number" data-item-field="hours" data-index="${index}" value="${item.hours}"></td>
+                        <td><input type="number" data-item-field="rate" data-index="${index}" value="${item.rate}"></td>
+                        <td class="total">${(item.hours * item.rate).toFixed(2)}</td>
+                        <td><i class="fas fa-trash-alt delete-row-btn" data-index="${index}"></i></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Calculate and render summary
+                calculateAndRenderSummary();
+            }
+
+            function calculateAndRenderSummary() {
+                const basicAmount = appState.items.reduce((sum, item) => sum + (item.hours * item.rate), 0);
+                const vatAmount = basicAmount * (appState.vatRate / 100);
+                const totalAmount = basicAmount + vatAmount;
+
+                document.getElementById('basic-amount').textContent = basicAmount.toFixed(2);
+                document.getElementById('vat-rate-display').textContent = appState.vatRate;
+                document.getElementById('vat-amount').textContent = vatAmount.toFixed(2);
+                document.getElementById('total-amount').textContent = totalAmount.toFixed(2);
+                document.getElementById('amount-in-words-display').textContent = numberToWords(totalAmount);
+            }
+
+            // --- Business Logic ---
+            function newInvoice() {
+                Object.assign(appState, {
+                    invoiceNo: '', invoiceDate: new Date().toLocaleDateString('en-CA'), orderNo: '', period: '',
+                    customerInfo: '', customerTrn: '',
+                    items: [{ description: '', hours: 0, rate: 0 }]
+                });
+                render();
+            }
+
+            function saveInvoice() {
+                if (!appState.invoiceNo) {
+                    alert('Please enter an Invoice Number before saving.');
+                    return;
+                }
+                const id = `inv-${appState.invoiceNo}`;
+                dbRequest(INVOICES_STORE, 'readwrite', 'put', { id, data: JSON.parse(JSON.stringify(appState)) })
+                    .then(() => {
+                        alert('Invoice saved successfully!');
+                        loadRecordHistory();
+                    });
+            }
+
+            function loadInvoice(id) {
+                dbRequest(INVOICES_STORE, 'readonly', 'get', id)
+                    .then(result => {
+                        if (result) {
+                            Object.assign(appState, result.data);
+                            render();
+                        }
+                    });
+            }
+            
+            function loadRecordHistory() {
+                const select = document.getElementById('record-history');
+                select.innerHTML = '<option selected disabled>Load Invoice...</option>';
+                dbRequest(INVOICES_STORE, 'readonly', 'getAllKeys').then(keys => {
+                    keys.sort().reverse().forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = key.replace('inv-', 'Invoice ');
+                        select.appendChild(option);
+                    });
+                });
+            }
+            
+            // --- Settings Logic ---
+            function applySettings(settings) {
+                document.getElementById('companyNameDisplay').textContent = settings.companyName || 'Your Company Name';
+                document.getElementById('header-logo-left').src = settings.logo || '';
+                document.getElementById('header-logo-right').src = settings.logo || '';
+                document.getElementById('footer-stamp').src = settings.stamp || '';
+                appState.vatRate = settings.vatRate || 5;
+                calculateAndRenderSummary();
+            }
+
+            function loadSettings() {
+                dbRequest(SETTINGS_STORE, 'readonly', 'get', 'config').then(settings => {
+                    if (settings) {
+                        applySettings(settings.data);
+                        // Populate modal fields
+                        document.getElementById('settingsCompanyName').value = settings.data.companyName;
+                        document.getElementById('settingsVatRate').value = settings.data.vatRate;
+                        document.getElementById('logoPreview').src = settings.data.logo;
+                        document.getElementById('logoPreview').style.display = settings.data.logo ? 'block' : 'none';
+                        document.getElementById('stampPreview').src = settings.data.stamp;
+                        document.getElementById('stampPreview').style.display = settings.data.stamp ? 'block' : 'none';
+                    }
+                });
+            }
+
+            function saveSettings() {
+                const settingsData = {
+                    companyName: document.getElementById('settingsCompanyName').value.trim(),
+                    vatRate: parseFloat(document.getElementById('settingsVatRate').value) || 5,
+                    logo: document.getElementById('logoPreview').src.startsWith('data:image') ? document.getElementById('logoPreview').src : '',
+                    stamp: document.getElementById('stampPreview').src.startsWith('data:image') ? document.getElementById('stampPreview').src : ''
+                };
+                dbRequest(SETTINGS_STORE, 'readwrite', 'put', { id: 'config', data: settingsData })
+                    .then(() => {
+                        applySettings(settingsData);
+                        alert('Settings saved!');
+                        bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+                    });
+            }
+
+            function setupImagePreview(inputId, previewId) {
+                document.getElementById(inputId).addEventListener('change', e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = re => {
+                            const preview = document.getElementById(previewId);
+                            preview.src = re.target.result;
+                            preview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // --- Helpers ---
+            function numberToWords(num) {
+                const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+                const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                const convert = n => {
+                    if (n < 20) return a[n];
+                    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
+                    if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 !== 0 ? ' and ' + convert(n % 100) : '');
+                    if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 !== 0 ? ' ' + convert(n % 1000) : '');
+                    return 'Number too large';
+                };
+                const mainPart = Math.floor(num);
+                const decimalPart = Math.round((num - mainPart) * 100);
+                let words = convert(mainPart);
+                words = words.charAt(0).toUpperCase() + words.slice(1);
+                if (decimalPart > 0) {
+                    words += ' and ' + decimalPart + ' Fills';
+                }
+                return words + ' only/-';
+            }
+
+
+            // --- Event Listeners ---
+            document.getElementById('app').addEventListener('input', e => {
+                const { field, itemField, index } = e.target.dataset;
+                if (field) {
+                    appState[field] = e.target.value;
+                } else if (itemField) {
+                    const i = parseInt(index, 10);
+                    appState.items[i][itemField] = e.target.value;
+                    if (itemField === 'hours' || itemField === 'rate') {
+                       calculateAndRenderSummary();
+                       // Update the line total cell specifically
+                       const row = e.target.closest('tr');
+                       const item = appState.items[i];
+                       row.querySelector('.total').textContent = (item.hours * item.rate).toFixed(2);
+                    }
+                }
+            });
+
+            document.getElementById('invoice-tbody').addEventListener('click', e => {
+                if (e.target.classList.contains('delete-row-btn')) {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    appState.items.splice(index, 1);
+                    render();
+                }
+            });
+
+            document.getElementById('add-row-btn').addEventListener('click', () => {
+                appState.items.push({ description: '', hours: 0, rate: 0 });
+                render();
+            });
+            
+            document.getElementById('new-btn').addEventListener('click', newInvoice);
+            document.getElementById('save-btn').addEventListener('click', saveInvoice);
+            document.getElementById('record-history').addEventListener('change', e => loadInvoice(e.target.value));
+            document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+            setupImagePreview('settingsLogo', 'logoPreview');
+            setupImagePreview('settingsStamp', 'stampPreview');
+
+            document.getElementById('export-image-btn').addEventListener('click', () => {
+                html2canvas(document.getElementById('printable-area'), { scale: 2 }).then(canvas => {
+                    const link = document.createElement('a');
+                    const invoiceNum = appState.invoiceNo || 'invoice';
+                    link.download = `invoice-${invoiceNum}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                });
+            });
+
+            // --- Initial Load ---
+            initDB().then(() => {
+                loadSettings();
+                loadRecordHistory();
+                render();
+            }).catch(console.error);
+
+        });
+    </script>
+</body>
+</html>
