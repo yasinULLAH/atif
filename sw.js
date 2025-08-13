@@ -58,7 +58,7 @@ if (workbox) {
     },
     {
         "url": "index.html",
-        "revision": "9c79b424b896609ec6f30ea20297e0e6"
+        "revision": "9ac3c8add4d825e74c9845b9cef6f35e"
     },
     {
         "url": "invoice.html",
@@ -66,7 +66,11 @@ if (workbox) {
     },
     {
         "url": "invoice2.html",
-        "revision": "8fcf4b353d2d6257adae369a0e031326"
+        "revision": "a94486b91b91174feab729850cba9c40"
+    },
+    {
+        "url": "invoice_343_2024-07-15 (1).png",
+        "revision": "a8cd083ca12361658f2a5c42d0b25376"
     },
     {
         "url": "invoice_343_2024-07-15.png",
@@ -79,6 +83,90 @@ if (workbox) {
     {
         "url": "invoice_343_2025-07-15.png",
         "revision": "f2843a7b739770b4e1ce44999b2a985b"
+    },
+    {
+        "url": "log (1).jpeg",
+        "revision": "489741c20cceecdc0110d297a293ea65"
+    },
+    {
+        "url": "log (1).png",
+        "revision": "f693ce8537846de882ebd13f5b535523"
+    },
+    {
+        "url": "log (2) bg.jpg",
+        "revision": "0f8241393557842ee731af21f232ce04"
+    },
+    {
+        "url": "log (2).jpeg",
+        "revision": "648b9857df83827d9e8341aeefde170b"
+    },
+    {
+        "url": "log (2).png",
+        "revision": "d6dbbcb03f92c79beb64866dfeda5f8a"
+    },
+    {
+        "url": "log (3).png",
+        "revision": "ab51086d9aba027fa090c841a8545934"
+    },
+    {
+        "url": "logo (1).jpeg",
+        "revision": "1f5b42adfba61aade5ae72b57b9d0c34"
+    },
+    {
+        "url": "logo (1).png",
+        "revision": "b3f5922a7b4845063f82f7416f265894"
+    },
+    {
+        "url": "logo (10).jpeg",
+        "revision": "70187bc440fbdd372972c423ec0bbce0"
+    },
+    {
+        "url": "logo (11).jpeg",
+        "revision": "faf3b54e9682bc0c9a23d1eff9645a29"
+    },
+    {
+        "url": "logo (2).jpeg",
+        "revision": "acfc7bb7b7a4c331012d096bbe25bf8b"
+    },
+    {
+        "url": "logo (2).png",
+        "revision": "8400bd91ca195d92948c9020e8497054"
+    },
+    {
+        "url": "logo (3).jpeg",
+        "revision": "e82e10cc59b3093936a01fbeccb4d490"
+    },
+    {
+        "url": "logo (3).png",
+        "revision": "05da493e426a440fc8acc0141fdc991b"
+    },
+    {
+        "url": "logo (4).jpeg",
+        "revision": "04177d2d9b37232a3f07a9cffad4de9e"
+    },
+    {
+        "url": "logo (4).png",
+        "revision": "a416b55ade67a749a8b80738492d8c7b"
+    },
+    {
+        "url": "logo (5).jpeg",
+        "revision": "52879bb1f54a7d80b5579ecc1a9eec7d"
+    },
+    {
+        "url": "logo (6).jpeg",
+        "revision": "57e0d12de7d08dc553e592c51c56807f"
+    },
+    {
+        "url": "logo (7).jpeg",
+        "revision": "47db837454b9bac22bf8b8027d30f947"
+    },
+    {
+        "url": "logo (8).jpeg",
+        "revision": "10b6f1c8d9f8643f8e7fa792afcde8c1"
+    },
+    {
+        "url": "logo (9).jpeg",
+        "revision": "138a8c160230f77e3a45fe29a595e858"
     },
     {
         "url": "logo.jpg",
@@ -98,7 +186,7 @@ if (workbox) {
     },
     {
         "url": "sw.js",
-        "revision": "08a1cb5df58270a8397cad70d603e89e"
+        "revision": "84bd65d466eb6d662b20cca55c5e3ee7"
     },
     {
         "url": "timesheet_Zubair_Ahmed_2025-08 (1).png",
@@ -110,7 +198,7 @@ if (workbox) {
     },
     {
         "url": "timesheet_Zubair_Ahmed_2025-08.png",
-        "revision": "f41f714d323c2f0a20ec91fac210ff3f"
+        "revision": "69e259b17bca01c4637d6a39c0286517"
     },
     {
         "url": "WhatsApp Image 2025-08-04 at 13.28.08_5b6f51b9.jpg",
@@ -123,6 +211,10 @@ if (workbox) {
     {
         "url": "WhatsApp Image 2025-08-04 at 15.02.23_ece6d2a5.jpg",
         "revision": "386c79b1ed503d6c28d0bab774b88deb"
+    },
+    {
+        "url": "WhatsApp Image 2025-08-13 at 14.28.46_84c62915.jpg",
+        "revision": "ee8c55dc1620be09de47b51cf051126a"
     }
 ]);
 
