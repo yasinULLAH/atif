@@ -1,18 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Invoice generator app based on Like Lion Transport invoice.">
-    <meta name="author" content="Yasin Ullah, Pakistan">
-    <title>Invoice Generator</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Invoice generator app based on Like Lion Transport invoice." name="description"/>
+<meta content="Yasin Ullah, Pakistan" name="author"/>
+<title>Invoice Generator</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
         :root {
             --border-color: #dee2e6;
             --primary-text: #212529;
@@ -119,138 +117,128 @@
             textarea, input { border: none !important; }
         }
     </style>
-</head>
-
+</link><link href="manifest.json" rel="manifest"/><link href="favicon.ico" rel="icon" type="image/x-icon"/></head>
 <body>
-
-    <main class="main-container" id="app">
-        <div class="actions-bar no-print">
-            <div class="d-flex flex-wrap gap-2">
-                <button id="new-btn" class="btn btn-primary"><i class="fas fa-file me-1"></i> New Invoice</button>
-                <button id="save-btn" class="btn btn-success"><i class="fas fa-save me-1"></i> Save Invoice</button>
-                <select id="record-history" class="form-select" style="width: auto;">
-                    <option selected>Load Invoice...</option>
-                </select>
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <button id="export-image-btn" class="btn btn-info"><i class="fas fa-file-image me-1"></i> Export Image</button>
-                <button id="settings-btn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="fas fa-cog me-1"></i> Settings</button>
-            </div>
-        </div>
-
-        <div class="printable-area" id="printable-area">
-            <header class="invoice-header">
-                <img src="" alt="Company Logo" id="header-logo-left" class="header-logo">
-                <div class="header-title">
-                    <h1 id="companyNameDisplay">LIKE LION GENERAL TRANSPORT & MAINTENANCE</h1>
-                    <h2>TAX INVOICE</h2>
-                </div>
-                <img src="" alt="Company Logo" id="header-logo-right" class="header-logo">
-            </header>
-
-            <div class="info-grid">
-                <div class="info-block">
-                    <strong>Bill To:</strong>
-                    <textarea data-field="customerInfo" rows="4" placeholder="Enter Customer Name and Address..."></textarea>
-                    <strong>TRN:</strong> <input type="text" data-field="customerTrn" placeholder="Customer TRN">
-                </div>
-                <div class="info-block">
-                    <strong>Invoice No:</strong> <input type="text" data-field="invoiceNo" placeholder="e.g., 343">
-                    <strong>Invoice Date:</strong> <input type="text" data-field="invoiceDate" placeholder="e.g., 15/07/2025">
-                    <strong>Order No:</strong> <input type="text" data-field="orderNo" placeholder="e.g., 1001461637">
-                    <strong>Period:</strong> <input type="text" data-field="period" placeholder="e.g., June-25">
-                </div>
-            </div>
-
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th style="width:5%">Sl</th>
-                        <th style="width:30%">Item Description</th>
-                        <th>Hours</th>
-                        <th>Rate</th>
-                        <th style="width:15%">Total</th>
-                        <th style="width:5%"></th>
-                    </tr>
-                </thead>
-                <tbody id="invoice-tbody">
-                    </tbody>
-            </table>
-            <button id="add-row-btn" class="btn btn-primary btn-sm no-print mb-3"><i class="fas fa-plus me-1"></i> Add Item</button>
-
-            <div class="summary-section">
-                <div class="amount-in-words">
-                    <strong>Amount in words:</strong><br>
-                    <span id="amount-in-words-display"></span>
-                </div>
-                <table class="summary-table">
-                    <tbody>
-                        <tr>
-                            <td>Basic Amount</td>
-                            <td id="basic-amount">0.00</td>
-                        </tr>
-                        <tr>
-                            <td>VAT (<span id="vat-rate-display">5</span>%)</td>
-                            <td id="vat-amount">0.00</td>
-                        </tr>
-                        <tr class="total">
-                            <td>Total Amount</td>
-                            <td id="total-amount">0.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <footer class="footer-section">
-                <div>
-                    <strong>Authorized Sig</strong>
-                </div>
-                <img src="" alt="Company Stamp" id="footer-stamp" class="footer-stamp">
-                <div>
-                    <strong>Receiver Sig</strong>
-                </div>
-            </footer>
-        </div>
-    </main>
-
-    <div class="modal fade no-print" id="settingsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Company Name</label>
-                        <input type="text" class="form-control" id="settingsCompanyName">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">VAT Rate (%)</label>
-                        <input type="number" class="form-control" id="settingsVatRate">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Company Logo</label>
-                        <input class="form-control" type="file" id="settingsLogo" accept="image/*">
-                        <img id="logoPreview" src="#" alt="Logo Preview" class="logo-preview" style="display: none;" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Company Stamp</label>
-                        <input class="form-control" type="file" id="settingsStamp" accept="image/*">
-                        <img id="stampPreview" src="#" alt="Stamp Preview" class="logo-preview" style="display: none;" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" id="save-settings-btn" class="btn btn-primary">Save Settings</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
+<main class="main-container" id="app">
+<div class="actions-bar no-print">
+<div class="d-flex flex-wrap gap-2">
+<button class="btn btn-primary" id="new-btn"><i class="fas fa-file me-1"></i> New Invoice</button>
+<button class="btn btn-success" id="save-btn"><i class="fas fa-save me-1"></i> Save Invoice</button>
+<select class="form-select" id="record-history" style="width: auto;">
+<option selected="">Load Invoice...</option>
+</select>
+</div>
+<div class="d-flex flex-wrap gap-2">
+<button class="btn btn-info" id="export-image-btn"><i class="fas fa-file-image me-1"></i> Export Image</button>
+<button class="btn btn-secondary" data-bs-target="#settingsModal" data-bs-toggle="modal" id="settings-btn"><i class="fas fa-cog me-1"></i> Settings</button>
+</div>
+</div>
+<div class="printable-area" id="printable-area">
+<header class="invoice-header">
+<img alt="Company Logo" class="header-logo" id="header-logo-left" src=""/>
+<div class="header-title">
+<h1 id="companyNameDisplay">LIKE LION GENERAL TRANSPORT &amp; MAINTENANCE</h1>
+<h2>TAX INVOICE</h2>
+</div>
+<img alt="Company Logo" class="header-logo" id="header-logo-right" src=""/>
+</header>
+<div class="info-grid">
+<div class="info-block">
+<strong>Bill To:</strong>
+<textarea data-field="customerInfo" placeholder="Enter Customer Name and Address..." rows="4"></textarea>
+<strong>TRN:</strong> <input data-field="customerTrn" placeholder="Customer TRN" type="text"/>
+</div>
+<div class="info-block">
+<strong>Invoice No:</strong> <input data-field="invoiceNo" placeholder="e.g., 343" type="text"/>
+<strong>Invoice Date:</strong> <input data-field="invoiceDate" placeholder="e.g., 15/07/2025" type="text"/>
+<strong>Order No:</strong> <input data-field="orderNo" placeholder="e.g., 1001461637" type="text"/>
+<strong>Period:</strong> <input data-field="period" placeholder="e.g., June-25" type="text"/>
+</div>
+</div>
+<table class="invoice-table">
+<thead>
+<tr>
+<th style="width:5%">Sl</th>
+<th style="width:30%">Item Description</th>
+<th>Hours</th>
+<th>Rate</th>
+<th style="width:15%">Total</th>
+<th style="width:5%"></th>
+</tr>
+</thead>
+<tbody id="invoice-tbody">
+</tbody>
+</table>
+<button class="btn btn-primary btn-sm no-print mb-3" id="add-row-btn"><i class="fas fa-plus me-1"></i> Add Item</button>
+<div class="summary-section">
+<div class="amount-in-words">
+<strong>Amount in words:</strong><br/>
+<span id="amount-in-words-display"></span>
+</div>
+<table class="summary-table">
+<tbody>
+<tr>
+<td>Basic Amount</td>
+<td id="basic-amount">0.00</td>
+</tr>
+<tr>
+<td>VAT (<span id="vat-rate-display">5</span>%)</td>
+<td id="vat-amount">0.00</td>
+</tr>
+<tr class="total">
+<td>Total Amount</td>
+<td id="total-amount">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<footer class="footer-section">
+<div>
+<strong>Authorized Sig</strong>
+</div>
+<img alt="Company Stamp" class="footer-stamp" id="footer-stamp" src=""/>
+<div>
+<strong>Receiver Sig</strong>
+</div>
+</footer>
+</div>
+</main>
+<div class="modal fade no-print" id="settingsModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Settings</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="mb-3">
+<label class="form-label">Company Name</label>
+<input class="form-control" id="settingsCompanyName" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label">VAT Rate (%)</label>
+<input class="form-control" id="settingsVatRate" type="number"/>
+</div>
+<div class="mb-3">
+<label class="form-label">Company Logo</label>
+<input accept="image/*" class="form-control" id="settingsLogo" type="file"/>
+<img alt="Logo Preview" class="logo-preview" id="logoPreview" src="#" style="display: none;">
+</img></div>
+<div class="mb-3">
+<label class="form-label">Company Stamp</label>
+<input accept="image/*" class="form-control" id="settingsStamp" type="file"/>
+<img alt="Stamp Preview" class="logo-preview" id="stampPreview" src="#" style="display: none;">
+</img></div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+<button class="btn btn-primary" id="save-settings-btn" type="button">Save Settings</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         document.addEventListener('DOMContentLoaded', () => {
             const DB_NAME = 'InvoiceGeneratorDB_V1';
             const DB_VERSION = 1;
@@ -517,5 +505,22 @@
 
         });
     </script>
-</body>
+<script type="module">
+  import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
+
+  const swUrl = './sw.js';
+  const wb = new Workbox(swUrl);
+
+  wb.addEventListener('waiting', (event) => {
+    console.log('A new service worker is waiting to activate.');
+    wb.messageSW({ type: 'SKIP_WAITING' });
+  });
+
+  wb.addEventListener('controlling', (event) => {
+    console.log('The new service worker is now in control. Reloading page for updates...');
+    window.location.reload();
+  });
+
+  wb.register();
+</script></body>
 </html>
