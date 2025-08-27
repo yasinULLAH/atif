@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ASR Prince — Transport Invoice App (Yasin Ullah)</title>
+    <style>
+        :root {
+            --accent: #1a2b6f;
+            --muted: #666;
+            --border: #333;
+            --bg: #fff;
+            --paper-max-width: 900px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f3f4f6;
+            color: #111
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 18px auto;
+            padding: 14px;
+            display: grid;
+            gap: 12px
+        }
+
+        header.toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .brand img {
+            height: 62px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #fff;
+            padding: 6px;
+            border: 1px solid #ddd
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--accent);
+            letter-spacing: 1px
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        button,
+        input[type="button"] {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            background: #fff;
+            cursor: pointer
+        }
+
+        .primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent)
+        }
+
+        .secondary {
+            background: #fff;
+            color: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .panel {
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02)
+        }
+
+        .layout {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start
+        }
+
+        .left {
+            flex: 1
+        }
+
+        .right {
+            width: 380px
+        }
+
+        .paper-wrap {
+            display: flex;
+            justify-content: center
+        }
+
+        .paper {
+            width: 100%;
+            max-width: var(--paper-max-width);
+            margin: 0 auto;
+            padding: 18px;
+            border: 2px solid var(--border);
+            background: #fff;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .invoice-head {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 2px solid #bfbfbf;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap
+        }
+
+        .invoice-head .titles {
+            flex: 1;
+            min-width: 200px
+        }
+
+        .inv-title {
+            font-size: 24px;
+            line-height: 1;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .inv-sub {
+            color: #b11919;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center
+        }
+
+        .ref-date {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px
+        }
+
+        .box {
+            border: 2px solid #333;
+            padding: 8px;
+            border-radius: 4px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 12px;
+            margin-top: 12px
+        }
+
+        .grid .leftbox {
+            min-height: 90px
+        }
+
+        .grid .rightbox {
+            border-left: 2px solid #333;
+            padding-left: 12px
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        .items-table th,
+        .items-table td {
+            border: 1px solid #333;
+            padding: 6px;
+            font-size: 13px;
+            vertical-align: top
+        }
+
+        .items-table th {
+            text-align: center;
+            background: #f5f5f5
+        }
+
+        .items-table td input,
+        .items-table td select,
+        .items-table td textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px
+        }
+
+        .items-table td input[type="number"] {
+            appearance: textfield
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .small {
+            font-size: 13px;
+            padding: 6px 8px
+        }
+
+        .totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            gap: 10px
+        }
+
+        .totals table {
+            border-collapse: collapse
+        }
+
+        .totals td {
+            padding: 6px 10px;
+            border: 1px solid #bbb;
+            background: #fff
+        }
+
+        .watermark {
+            position: absolute;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            opacity: 0.06;
+            font-size: 120px;
+            color: #000;
+            font-weight: 900;
+            pointer-events: none;
+            white-space: nowrap
+        }
+
+        .list {
+            max-height: 520px;
+            overflow: auto
+        }
+
+        .invoice-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        footer {
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            padding: 12px
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 60;
+            overflow-y: scroll;
+        }
+
+        .modal {
+            width: 760px;
+            max-width: 96%;
+            background: #fff;
+            padding: 14px;
+            border-radius: 10px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25)
+        }
+
+        label {
+            display: block;
+            margin-top: 6px;
+            font-weight: 600
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px
+        }
+
+        .small-muted {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px
+        }
+
+        @media (max-width:1100px) {
+            :root {
+                --paper-max-width: 820px
+            }
+
+            .right {
+                width: 340px
+            }
+        }
+
+        @media (max-width:980px) {
+            .layout {
+                flex-direction: column
+            }
+
+            .right {
+                width: 100%
+            }
+
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .invoice-head {
+                justify-content: flex-start
+            }
+        }
+
+        @media (max-width:520px) {
+
+            .items-table th,
+            .items-table td {
+                font-size: 12px;
+                padding: 4px
+            }
+
+            .inv-title {
+                font-size: 20px
+            }
+
+            .inv-sub {
+                font-size: 16px
+            }
+        }
+
+        @media print {
+            body {
+                background: none
+            }
+
+            .app>* {
+                display: none
+            }
+
+            .paper {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%
+            }
+
+            .modal-backdrop {
+                display: none
+            }
+
+            .watermark {
+                display: none
+            }
+        }
+
+        @media print {
+
+            /* Hide elements that should not be printed */
+            header.toolbar,
+            .right,
+            footer,
+            .controls,
+            .toolbar-actions,
+            #addRowBtn,
+            #clearRowsBtn,
+            .items-table th:last-child,
+            .items-table td:last-child {
+                display: none;
+            }
+
+            /* Reset body and app container for a clean print layout */
+            body,
+            .app {
+                background: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Ensure the layout containers and the paper take up the full width */
+            .layout,
+            .left,
+            .paper-wrap,
+            .paper {
+                display: block;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* Ensure contenteditable regions are not editable in print */
+            [contenteditable="true"] {
+                border: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="toolbar">
+            <div class="brand">
+                <img id="companyLogo" alt="logo" src="" />
+                <div>
+                    <h1 id="companyName">ASR PRINCE TRANSPORT AND GENERAL CONTRACTING</h1>
+                    <div id="companyTag" class="muted">اسر پرنس للنقليات والمقاولات العامة</div>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="toolbar-actions">
+                    <button class="primary" id="newInvoiceBtn">New Invoice</button>
+                    <button id="saveInvoiceBtn">Save</button>
+                    <button id="printBtn">Print / PDF</button>
+                    <button id="exportCsvBtn">Export CSV</button>
+                    <button id="exportJsonBtn">Backup JSON</button>
+                    <button id="importJsonBtn">Restore JSON</button>
+                    <button id="exportImageBtn">Export Image</button>
+                    <button id="settingsBtn">Settings</button>
+                </div>
+            </div>
+        </header>
+        <div class="layout">
+            <div class="left panel">
+                <div class="paper-wrap">
+                    <div class="paper" id="paper">
+                        <div class="invoice-head">
+                            <div style="width:160px">
+                                <img id="headerLogo" src="" alt="logo"
+                                    style="width:160px;height:auto;object-fit:contain" />
+                            </div>
+                            <div class="titles">
+                                <div class="inv-sub" contenteditable="true" id="arabicTitle">اسر پرنس للنقليات
+                                    والمقاولات العامه</div>
+                                <div class="inv-title" contenteditable="true" id="englishTitle">ASR PRINCE TRANSPORT AND
+                                    GENERAL CONTRACTING</div>
+                            </div>
+                            <div style="width:220px;text-align:right">
+                                <div class="box">
+                                    <div><strong>Ref No.</strong> <span id="refNo">-</span></div>
+                                    <div style="margin-top:6px"><strong>Date:</strong> <input type="date"
+                                            id="invoiceDate" /></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div class="leftbox box">
+                                <div id="billTo" contenteditable="true" style="min-height:70px">
+                                    <strong>Bill To / کس کو: </strong>
+                                    <p>Client Name: </p>
+                                    <p>Address line: </p>
+                                </div>
+                            </div>
+                            <div class="rightbox box">
+                                <div><strong>Invoice No:</strong> <span id="invoiceNoDisplay">-</span></div>
+                                <div style="margin-top:6px"><strong>Invoice Date:</strong> <span
+                                        id="invoiceDateDisplay">-</span></div>
+                                <div style="margin-top:8px"><strong>Order No:</strong> <span
+                                        id="orderNoDisplay">-</span></div>
+                                <div style="margin-top:8px"><strong>Period:</strong> <span id="periodDisplay">-</span>
+                                </div>
+                                <div style="margin-top:8px">Email: <span id="companyEmail">azizrehman00@gmail.com</span>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="items-table" id="items">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px">SI</th>
+                                    <th>Item Description</th>
+                                    <th style="width:120px">Month</th>
+                                    <th style="width:90px">Vehicle</th>
+                                    <th style="width:72px">UOM</th>
+                                    <th style="width:98px">Rate / Month</th>
+                                    <th style="width:98px">Normal Rate</th>
+                                    <th style="width:98px">Overtime Rate</th>
+                                    <th style="width:98px">Normal Hour</th>
+                                    <th style="width:98px">Overtime Hour</th>
+                                    <th style="width:120px">Total Amount</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody"></tbody>
+                        </table>
+                        <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+                            <button class="small" id="addRowBtn">+ Add Row</button>
+                            <button class="small" id="clearRowsBtn">Clear Rows</button>
+                            <div style="flex:1"></div>
+                        </div>
+                        <div class="totals">
+                            <table>
+                                <tr>
+                                    <td style="min-width:160px">Basic Amount</td>
+                                    <td id="basicAmount">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>VAT (<span id="vatPercentDisplay">0</span>%)</td>
+                                    <td id="vatAmount">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Amount</strong></td>
+                                    <td id="grandTotal">0.00</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style="margin-top:8px;border-top:1px solid #ddd;padding-top:10px">
+                            <div><strong>Amount in words:</strong> <span id="amountWords">Zero</span></div>
+                        </div>
+                        <div class="watermark" id="watermark">ASR PRINCE</div>
+                        <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center">
+                            <div>Authorized Sig____________</div>
+                            <div>Receiver Sig____________</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="panel">
+                    <h3>Drafts & Saved Invoices</h3>
+                    <div style="display:flex;gap:8px;margin-bottom:8px">
+                        <input id="searchInput" placeholder="Search by invoice no / client / order"
+                            style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc" />
+                        <button id="filterBtn">Filter</button>
+                    </div>
+                    <div class="list" id="savedList"></div>
+                </div>
+                <div class="panel" style="margin-top:12px">
+                    <h3>Quick Settings</h3>
+                    <label>Currency</label>
+                    <input type="text" id="currencyInput" placeholder="PKR" />
+                    <label>VAT %</label>
+                    <input type="number" id="vatInput" min="0" max="100" />
+                    <label>Default Ref No</label>
+                    <input type="text" id="refPattern" placeholder="INV-{yyyy}{mm}{dd}-{seq}" />
+                    <div style="margin-top:8px;display:flex;gap:8px">
+                        <button id="applyQuickSettings" class="primary small">Apply</button>
+                        <button class="small" id="resetSettings">Reset</button>
+                    </div>
+                    <div class="small-muted" style="margin-top:8px">Ref pattern tokens: {yyyy},{mm},{dd},{seq}</div>
+                </div>
+            </div>
+        </div>
+        <footer class="muted">Single-file Invoice app • Data stored locally in your browser (IndexedDB)</footer>
+    </div>
+    <div id="modalRoot" style="display:none"></div>
+    <script>
+        /* -----------------------
+          App code — all in single file
+           - DOMContentLoaded wrapper to avoid "null" element errors
+           - Month pickers, responsive layout
+           - Export to image & PDF (client-side, no external libs)
+        ------------------------*/
+        document.addEventListener('DOMContentLoaded', () => {
+            const $ = id => document.getElementById(id);
+            const money = n => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const uid = (len = 10) => Math.random().toString(36).slice(2, 2 + len);
+            const nowISO = () => new Date().toISOString();
+            const formatDateInputToDisplay = d => { if (!d) return '-'; try { return new Date(d).toLocaleDateString() } catch (e) { return d } };
+            function stripTags(html) { const d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent || ''; }
+            function escapeHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            const DB_NAME = 'invoices-db';
+            const DB_VERSION = 1;
+            const STORE_INVOICES = 'invoices';
+            const STORE_SETTINGS = 'settings';
+            let db;
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(DB_NAME, DB_VERSION);
+                    req.onupgradeneeded = e => {
+                        db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_INVOICES)) db.createObjectStore(STORE_INVOICES, { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains(STORE_SETTINGS)) db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+                    };
+                    req.onsuccess = e => { db = e.target.result; resolve(db); }
+                    req.onerror = e => reject(e.target.error)
+                });
+            }
+            function putStore(storeName, value) {
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.put(value);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            function getStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            function allFromStore(storeName) {
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.getAll();
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            function deleteFromStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.delete(key);
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            let appState = {
+                invoice: null,
+                settings: {
+                    companyName: 'ASR PRINCE TRANSPORT AND GENERAL CONTRACTING',
+                    companyTag: 'اسر پرنس للنقليات والمقاولات العامة',
+                    companyEmail: 'azizrehman00@gmail.com',
+                    logoDataUrl: '',
+                    vatPercent: 0,
+                    currency: 'PKR',
+                    refPattern: 'INV-{yyyy}{mm}{dd}-{seq}'
+                }
+            };
+            const itemsBody = $('itemsBody');
+            const addRowBtn = $('addRowBtn');
+            const clearRowsBtn = $('clearRowsBtn');
+            const saveInvoiceBtn = $('saveInvoiceBtn');
+            const newInvoiceBtn = $('newInvoiceBtn');
+            const printBtn = $('printBtn');
+            const exportCsvBtn = $('exportCsvBtn');
+            const exportJsonBtn = $('exportJsonBtn');
+            const importJsonBtn = $('importJsonBtn');
+            const settingsBtn = $('settingsBtn');
+            const exportImageBtn = $('exportImageBtn');
+            const savedList = $('savedList');
+            const searchInput = $('searchInput');
+            const applyQuickSettings = $('applyQuickSettings');
+            const vatInput = $('vatInput');
+            const currencyInput = $('currencyInput');
+            const refPatternInput = $('refPattern');
+            const resetSettingsBtn = $('resetSettings');
+            const companyNameEl = $('companyName');
+            const companyTagEl = $('companyTag');
+            const headerLogo = $('headerLogo');
+            const companyLogoEl = $('companyLogo');
+            const invoiceNoDisplay = $('invoiceNoDisplay');
+            const invoiceDateEl = $('invoiceDate');
+            const invoiceDateDisplay = $('invoiceDateDisplay');
+            const orderNoDisplay = $('orderNoDisplay');
+            const periodDisplay = $('periodDisplay');
+            const companyEmailEl = $('companyEmail');
+            const basicAmountEl = $('basicAmount');
+            const vatAmountEl = $('vatAmount');
+            const grandTotalEl = $('grandTotal');
+            const amountWordsEl = $('amountWords');
+            const vatPercentDisplay = $('vatPercentDisplay');
+            const modalRoot = $('modalRoot');
+            const paperEl = $('paper');
+            function newInvoiceTemplate() {
+                return {
+                    id: uid(12),
+                    ref: generateRef(),
+                    invoiceNo: 'INV-' + Math.floor(Math.random() * 900000 + 1000),
+                    date: new Date().toISOString().slice(0, 10),
+                    billTo: '<strong>Bill To / کس کو:&nbsp;&nbsp;</strong><p>Client Name:&nbsp;&nbsp;</p><p>Address line:&nbsp;&nbsp;</p>',
+                    orderNo: '',
+                    period: '',
+                    items: [
+                        { si: 1, description: '', month: '', vehicle: '', uom: '', rateMonth: 0, normalRate: 0, overtimeRate: 0, normalHour: 0, overtimeHour: 0, total: 0 }
+                    ],
+                    basicAmount: 0,
+                    vatAmount: 0,
+                    grandTotal: 0,
+                    createdAt: nowISO(),
+                    updatedAt: nowISO()
+                };
+            }
+            function generateRef() {
+                const p = appState.settings.refPattern || 'INV-{yyyy}{mm}{dd}-{seq}';
+                const d = new Date();
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const seq = Math.floor(Math.random() * 9000 + 1000);
+                return p.replace('{yyyy}', yyyy).replace('{mm}', mm).replace('{dd}', dd).replace('{seq}', seq);
+            }
+            function renderCompany() {
+                companyNameEl.textContent = appState.settings.companyName || 'ASR PRINCE';
+                companyTagEl.textContent = appState.settings.companyTag || '';
+                companyEmailEl.textContent = appState.settings.companyEmail || '';
+                headerLogo.src = appState.settings.logoDataUrl || '';
+                if (companyLogoEl) companyLogoEl.src = appState.settings.logoDataUrl || '';
+                vatInput.value = Number(appState.settings.vatPercent || 0);
+                currencyInput.value = appState.settings.currency || 'PKR';
+                refPatternInput.value = appState.settings.refPattern || '';
+                vatPercentDisplay.textContent = Number(appState.settings.vatPercent || 0);
+            }
+            function renderInvoice(inv) {
+                if (!inv) inv = appState.invoice;
+                invoiceNoDisplay.textContent = inv.invoiceNo || inv.ref || '-';
+                invoiceDateEl.value = inv.date ? inv.date.slice(0, 10) : '';
+                invoiceDateDisplay.textContent = formatDateInputToDisplay(inv.date);
+                orderNoDisplay.textContent = inv.orderNo || '-';
+                periodDisplay.textContent = inv.period || '-';
+                $('billTo').innerHTML = inv.billTo || '';
+                itemsBody.innerHTML = '';
+                inv.items.forEach((r, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.index = idx;
+                    const monthVal = r.month ? String(r.month) : '';
+                    tr.innerHTML = `
+        <td style="text-align:center">${idx + 1}</td>
+        <td><textarea class="desc" rows="2" placeholder="Description">${escapeHtmlForTextarea(r.description)}</textarea></td>
+        <td><input type="month" class="monthInput" value="${monthVal}" /></td>
+        <td><input type="text" class="vehicle" value="${escapeHtml(r.vehicle)}" /></td>
+        <td><input type="text" class="uom" value="${escapeHtml(r.uom)}" /></td>
+        <td><input type="number" step="0.01" class="rateMonth" value="${Number(r.rateMonth) || 0}" /></td>
+        <td><input type="number" step="0.01" class="normalRate" value="${Number(r.normalRate) || 0}" /></td>
+        <td><input type="number" step="0.01" class="overtimeRate" value="${Number(r.overtimeRate) || 0}" /></td>
+        <td><input type="number" step="0.01" class="normalHour" value="${Number(r.normalHour) || 0}" /></td>
+        <td><input type="number" step="0.01" class="overtimeHour" value="${Number(r.overtimeHour) || 0}" /></td>
+        <td><div class="total" data-readonly="true">${money(r.total)}</div></td>
+        <td style="text-align:center"><button class="small removeRow">✖</button></td>
+      `;
+                    itemsBody.appendChild(tr);
+                });
+                computeTotals();
+            }
+            function escapeHtmlForTextarea(s) {
+                if (!s) return '';
+                return (stripTags(s)).replace(/\r/g, '').replace(/\n/g, '\n');
+            }
+            function computeTotals() {
+                const inv = appState.invoice;
+                let basic = 0;
+                const rows = Array.from(itemsBody.querySelectorAll('tr'));
+                rows.forEach((rowEl, idx) => {
+                    const getVal = sel => rowEl.querySelector(sel)?.value ?? rowEl.querySelector(sel)?.innerText ?? '';
+                    const desc = rowEl.querySelector('.desc')?.value || '';
+                    const month = rowEl.querySelector('.monthInput')?.value || '';
+                    const vehicle = rowEl.querySelector('.vehicle')?.value || '';
+                    const uom = rowEl.querySelector('.uom')?.value || '';
+                    const rateMonth = parseFloat(rowEl.querySelector('.rateMonth')?.value || 0) || 0;
+                    const normalRate = parseFloat(rowEl.querySelector('.normalRate')?.value || 0) || 0;
+                    const overtimeRate = parseFloat(rowEl.querySelector('.overtimeRate')?.value || 0) || 0;
+                    const normalHour = parseFloat(rowEl.querySelector('.normalHour')?.value || 0) || 0;
+                    const overtimeHour = parseFloat(rowEl.querySelector('.overtimeHour')?.value || 0) || 0;
+                    const total = rateMonth + (normalRate * normalHour) + (overtimeRate * overtimeHour);
+                    inv.items[idx].description = desc;
+                    inv.items[idx].month = month;
+                    inv.items[idx].vehicle = vehicle;
+                    inv.items[idx].uom = uom;
+                    inv.items[idx].rateMonth = rateMonth;
+                    inv.items[idx].normalRate = normalRate;
+                    inv.items[idx].overtimeRate = overtimeRate;
+                    inv.items[idx].normalHour = normalHour;
+                    inv.items[idx].overtimeHour = overtimeHour;
+                    inv.items[idx].total = total;
+                    const totalNode = rowEl.querySelector('.total');
+                    if (totalNode) totalNode.innerText = money(total);
+                    basic += total;
+                });
+                inv.basicAmount = basic;
+                const vat = (basic * (Number(appState.settings.vatPercent || 0) / 100));
+                inv.vatAmount = vat;
+                inv.grandTotal = basic + vat;
+                basicAmountEl.innerText = money(basic);
+                vatAmountEl.innerText = money(vat);
+                grandTotalEl.innerText = money(inv.grandTotal);
+                amountWordsEl.innerText = numToWords(Math.round(inv.grandTotal)) + ' only';
+                vatPercentDisplay.innerText = Number(appState.settings.vatPercent || 0);
+            }
+            function numToWords(n) {
+                if (n === 0) return 'Zero';
+                const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+                const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+                function inHundreds(num) {
+                    let str = '';
+                    if (num > 99) { str += a[Math.floor(num / 100)] + ' Hundred '; num = num % 100; }
+                    if (num > 19) { str += b[Math.floor(num / 10)] + (num % 10 ? ' ' + a[num % 10] : ''); }
+                    else if (num > 0) str += a[num];
+                    return str.trim();
+                }
+                let words = '';
+                if (n >= 1_000_000) { words += inHundreds(Math.floor(n / 1_000_000)) + ' Million '; n = n % 1_000_000; }
+                if (n >= 1000) { words += inHundreds(Math.floor(n / 1000)) + ' Thousand '; n = n % 1000; }
+                if (n > 0) { words += inHundreds(n); }
+                return words.trim();
+            }
+            async function saveInvoice() {
+                computeTotals();
+                const inv = appState.invoice;
+                inv.updatedAt = nowISO();
+                await putStore(STORE_INVOICES, inv);
+                await showSavedList();
+                alert('Invoice saved locally.');
+            }
+            async function showSavedList(filter = '') {
+                const all = await allFromStore(STORE_INVOICES);
+                all.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                savedList.innerHTML = '';
+                const q = String(filter || '').toLowerCase();
+                all.forEach(inv => {
+                    const text = `${inv.invoiceNo} ${stripTags(inv.billTo)} ${inv.orderNo}`.toLowerCase();
+                    if (q && !text.includes(q)) return;
+                    const row = document.createElement('div');
+                    row.className = 'invoice-row';
+                    row.innerHTML = `
+        <div style="width:48px">${new Date(inv.date || inv.createdAt).toLocaleDateString()}</div>
+        <div style="flex:1;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div><strong>${inv.invoiceNo || inv.ref}</strong> <span class="muted">(${inv.ref || ''})</span></div>
+            <div class="muted">${stripTags(inv.billTo).slice(0, 60)}</div>
+          </div>
+          <div style="text-align:right">
+            <div><strong>${money(inv.grandTotal)}</strong></div>
+            <div style="margin-top:8px">
+              <button class="small loadBtn">Load</button>
+              <button class="small editBtn">Edit</button>
+              <button class="small removeBtn">Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+                    savedList.appendChild(row);
+                    row.querySelector('.loadBtn').onclick = () => { if (confirm('Load this invoice (preview)? Unsaved changes will be lost.')) loadInvoice(inv.id, false); };
+                    row.querySelector('.editBtn').onclick = () => { loadInvoice(inv.id, true); };
+                    row.querySelector('.removeBtn').onclick = async () => { if (confirm('Delete this invoice permanently?')) { await deleteFromStore(STORE_INVOICES, inv.id); await showSavedList(); } };
+                });
+            }
+            async function loadInvoice(id, editMode) {
+                const inv = await getStore(STORE_INVOICES, id);
+                if (!inv) return alert('Invoice not found');
+                appState.invoice = inv;
+                renderInvoice(inv);
+                if (editMode) { setTimeout(() => itemsBody.querySelector('tr .desc')?.focus(), 100); }
+            }
+            function addRow() {
+                const inv = appState.invoice;
+                const idx = inv.items.length + 1;
+                inv.items.push({ si: idx, description: '', month: '', vehicle: '', uom: '', rateMonth: 0, normalRate: 0, overtimeRate: 0, normalHour: 0, overtimeHour: 0, total: 0 });
+                renderInvoice(inv);
+                setTimeout(() => { const last = itemsBody.querySelector('tr:last-child .desc'); if (last) last.focus(); }, 50);
+            }
+            function clearRows() {
+                if (!confirm('Clear all rows?')) return;
+                appState.invoice.items = [{ si: 1, description: '', month: '', vehicle: '', uom: '', rateMonth: 0, normalRate: 0, overtimeRate: 0, normalHour: 0, overtimeHour: 0, total: 0 }];
+                renderInvoice(appState.invoice);
+            }
+            function openSettingsModal() {
+                modalRoot.innerHTML = `
+      <div class="modal-backdrop" id="settingsBackdrop">
+        <div class="modal" role="dialog" aria-modal="true">
+          <h3>App Settings</h3>
+          <label>Company Name</label>
+          <input id="s_companyName" type="text" value="${escapeHtml(appState.settings.companyName)}">
+          <label>Company Tag / Arabic Title</label>
+          <input id="s_companyTag" type="text" value="${escapeHtml(appState.settings.companyTag)}">
+          <label>Company Email</label>
+          <input id="s_companyEmail" type="text" value="${escapeHtml(appState.settings.companyEmail)}">
+          <label>Logo (PNG/JPG)</label>
+          <input id="s_logo" type="file" accept="image/*">
+          <div class="small-muted">Current logo preview:</div>
+          <img id="s_logo_preview" src="${appState.settings.logoDataUrl || ''}" style="max-height:120px;margin-top:6px" />
+          <label>VAT %</label>
+          <input id="s_vat" type="number" min="0" max="100" value="${Number(appState.settings.vatPercent || 0)}">
+          <label>Currency</label>
+          <input id="s_currency" type="text" value="${escapeHtml(appState.settings.currency || 'PKR')}">
+          <label>Ref Pattern</label>
+          <input id="s_refpattern" type="text" value="${escapeHtml(appState.settings.refPattern || 'INV-{yyyy}{mm}{dd}-{seq}')}" />
+          <div class="small-muted">Tokens: {yyyy} {mm} {dd} {seq}</div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+            <button id="s_save" class="primary">Save</button>
+            <button id="s_cancel">Cancel</button>
+            <button id="s_clearlogo">Clear Logo</button>
+          </div>
+        </div>
+      </div>
+    `;
+                modalRoot.style.display = 'block';
+                $('#settingsBackdrop').onclick = (e) => { if (e.target.id === 'settingsBackdrop') closeModal(); };
+                modalRoot.querySelector('#s_cancel').onclick = closeModal;
+                $('#s_clearlogo').onclick = () => {
+                    appState.settings.logoDataUrl = '';
+                    $('#s_logo_preview').src = '';
+                };
+                $('#s_logo').addEventListener('change', (ev) => {
+                    const f = ev.target.files[0];
+                    if (!f) return;
+                    const reader = new FileReader();
+                    reader.onload = e => { $('#s_logo_preview').src = e.target.result; appState.settings.logoDataUrl = e.target.result; };
+                    reader.readAsDataURL(f);
+                });
+                $('#s_save').onclick = async () => {
+                    appState.settings.companyName = $('#s_companyName').value || appState.settings.companyName;
+                    appState.settings.companyTag = $('#s_companyTag').value || appState.settings.companyTag;
+                    appState.settings.companyEmail = $('#s_companyEmail').value || appState.settings.companyEmail;
+                    appState.settings.vatPercent = Number($('#s_vat').value || 0);
+                    appState.settings.currency = $('#s_currency').value || 'PKR';
+                    appState.settings.refPattern = $('#s_refpattern').value || appState.settings.refPattern;
+                    if ($('#s_logo_preview').src) appState.settings.logoDataUrl = $('#s_logo_preview').src;
+                    await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                    closeModal();
+                    renderCompany();
+                    computeTotals();
+                    alert('Settings saved.');
+                };
+            }
+            function closeModal() {
+                modalRoot.innerHTML = '';
+                modalRoot.style.display = 'none';
+            }
+            async function exportJSONBackup() {
+                const all = await allFromStore(STORE_INVOICES);
+                const settings = appState.settings;
+                const payload = { exportedAt: nowISO(), settings, invoices: all };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'invoice-backup-' + (new Date().toISOString().slice(0, 10)) + '.json';
+                document.body.appendChild(a); a.click(); a.remove();
+                URL.revokeObjectURL(url);
+            }
+            function importJSONBackup() {
+                const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/json';
+                input.onchange = async (e) => {
+                    const f = e.target.files[0];
+                    if (!f) return;
+                    const txt = await f.text();
+                    try {
+                        const payload = JSON.parse(txt);
+                        if (!payload || !Array.isArray(payload.invoices)) return alert('Invalid backup file.');
+                        if (payload.settings && confirm('Restore app settings from backup?')) {
+                            appState.settings = payload.settings;
+                            await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                            renderCompany();
+                        }
+                        for (const inv of payload.invoices) {
+                            inv.id = inv.id || uid(12);
+                            await putStore(STORE_INVOICES, inv);
+                        }
+                        alert('Imported invoices: ' + payload.invoices.length);
+                        showSavedList();
+                    } catch (err) {
+                        alert('Import failed: ' + err.message);
+                    }
+                };
+                input.click();
+            }
+            async function exportCSV() {
+                const all = await allFromStore(STORE_INVOICES);
+                if (!all.length) return alert('No invoices to export');
+                const rows = [];
+                const hdr = ['invoiceId', 'invoiceNo', 'date', 'billTo', 'orderNo', 'period', 'itemSi', 'desc', 'month', 'vehicle', 'uom', 'rateMonth', 'normalRate', 'overtimeRate', 'normalHour', 'overtimeHour', 'itemTotal', 'invoiceBasic', 'vat', 'invoiceTotal'];
+                rows.push(hdr.join(','));
+                all.forEach(inv => {
+                    inv.items.forEach(it => {
+                        const row = [
+                            inv.id, inv.invoiceNo || inv.ref, inv.date, `"${(stripTags(inv.billTo)).replace(/"/g, '""')}"`, inv.orderNo || '', inv.period || '',
+                            it.si || '', `"${(stripTags(it.description || '')).replace(/"/g, '""')}"`, it.month || '', it.vehicle || '', it.uom || '', it.rateMonth || 0, it.normalRate || 0, it.overtimeRate || 0, it.normalHour || 0, it.overtimeHour || 0, it.total || 0,
+                            inv.basicAmount || 0, inv.vatAmount || 0, inv.grandTotal || 0
+                        ];
+                        rows.push(row.join(','));
+                    });
+                });
+                const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'invoices-export.csv';
+                document.body.appendChild(a); a.click(); a.remove();
+                URL.revokeObjectURL(url);
+            }
+            async function exportPaperAsImage() {
+                const rect = paperEl.getBoundingClientRect();
+                const clone = paperEl.cloneNode(true);
+                const css = window.getComputedStyle(paperEl);
+                const serialized = `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(rect.width)}" height="${Math.ceil(rect.height)}">
+      <foreignObject width="100%" height="100%">
+        ${new XMLSerializer().serializeToString(clone)}
+      </foreignObject>
+    </svg>`;
+                const svgBlob = new Blob([serialized], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = Math.ceil(rect.width * 2);
+                            canvas.height = Math.ceil(rect.height * 2);
+                            const ctx = canvas.getContext('2d');
+                            ctx.scale(2, 2);
+                            ctx.drawImage(img, 0, 0);
+                            URL.revokeObjectURL(url);
+                            resolve(canvas.toDataURL('image/png'));
+                        } catch (err) {
+                            URL.revokeObjectURL(url);
+                            reject(err);
+                        }
+                    };
+                    img.onerror = (e) => { URL.revokeObjectURL(url); reject(new Error('Failed to render SVG to image')); };
+                    img.src = url;
+                });
+            }
+            async function downloadImageFromDataURL(dataUrl, filename = 'invoice.png') {
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = filename;
+                document.body.appendChild(a); a.click(); a.remove();
+            }
+            async function exportToImageHandler() {
+                try {
+                    const dataUrl = await exportPaperAsImage();
+                    await downloadImageFromDataURL(dataUrl, 'invoice-' + (new Date().toISOString().slice(0, 10)) + '.png');
+                } catch (err) {
+                    console.error(err);
+                    alert('Export to image failed — using print fallback. Error: ' + err.message);
+                    window.print();
+                }
+            }
+            async function exportToPDFHandler() {
+                try {
+                    const imgData = await exportPaperAsImage();
+                    const a4WidthPx = 595;
+                    const img = new Image();
+                    img.src = imgData;
+                    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+                    const scale = a4WidthPx / img.width;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = a4WidthPx;
+                    canvas.height = Math.round(img.height * scale);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const pdfData = canvas.toDataURL('application/pdf');
+                    downloadImageFromDataURL(canvas.toDataURL('image/png'), 'invoice-' + (new Date().toISOString().slice(0, 10)) + '.png');
+                    alert('Image exported. Use "Print -> Save as PDF" to create a PDF from the downloaded image, or use your OS print dialog from browser.');
+                } catch (err) {
+                    console.error(err);
+                    alert('Export to PDF failed — using print fallback. Error: ' + err.message);
+                    window.print();
+                }
+            }
+            async function loadSettingsFromDB() {
+                const rec = await getStore(STORE_SETTINGS, 'app_settings');
+                if (rec && rec.value) appState.settings = Object.assign(appState.settings, rec.value);
+                renderCompany();
+            }
+            addRowBtn.onclick = addRow;
+            clearRowsBtn.onclick = clearRows;
+            saveInvoiceBtn.onclick = async () => {
+                appState.invoice.date = invoiceDateEl.value;
+                appState.invoice.ref = appState.invoice.ref || generateRef();
+                appState.invoice.invoiceNo = invoiceNoDisplay.textContent || appState.invoice.invoiceNo;
+                appState.invoice.orderNo = orderNoDisplay.textContent || '';
+                appState.invoice.period = periodDisplay.textContent || '';
+                appState.invoice.billTo = $('billTo').innerHTML;
+                await saveInvoice();
+            };
+            newInvoiceBtn.onclick = () => {
+                if (confirm('Create a new invoice? Unsaved changes will be lost.')) {
+                    appState.invoice = newInvoiceTemplate();
+                    renderInvoice(appState.invoice);
+                }
+            };
+            printBtn.onclick = () => { computeTotals(); window.print(); };
+            exportJsonBtn.onclick = exportJSONBackup;
+            importJsonBtn.onclick = importJSONBackup;
+            exportCsvBtn.onclick = exportCSV;
+            settingsBtn.onclick = openSettingsModal;
+            exportImageBtn.onclick = exportToImageHandler;
+            printBtn.ondblclick = exportToPDFHandler;
+            searchInput.oninput = () => showSavedList(searchInput.value);
+            $('filterBtn').onclick = () => showSavedList(searchInput.value);
+            applyQuickSettings.onclick = async () => {
+                appState.settings.vatPercent = Number(vatInput.value || 0);
+                appState.settings.currency = currencyInput.value || 'PKR';
+                appState.settings.refPattern = refPatternInput.value || appState.settings.refPattern;
+                await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                renderCompany();
+                computeTotals();
+                alert('Quick settings applied.');
+            };
+            resetSettingsBtn.onclick = async () => {
+                if (confirm('Reset settings to default?')) {
+                    appState.settings = {
+                        companyName: 'ASR PRINCE TRANSPORT AND GENERAL CONTRACTING',
+                        companyTag: 'اسر پرنس للنقليات والمقاولات العامة',
+                        companyEmail: 'azizrehman00@gmail.com',
+                        logoDataUrl: '',
+                        vatPercent: 0,
+                        currency: 'PKR',
+                        refPattern: 'INV-{yyyy}{mm}{dd}-{seq}'
+                    };
+                    await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                    renderCompany();
+                    computeTotals();
+                    alert('Settings reset.');
+                }
+            };
+            itemsBody.addEventListener('input', (e) => {
+                computeTotals();
+            });
+            itemsBody.addEventListener('click', (e) => {
+                if (e.target.matches('.removeRow')) {
+                    const tr = e.target.closest('tr');
+                    const idx = Number(tr.dataset.index);
+                    appState.invoice.items.splice(idx, 1);
+                    appState.invoice.items.forEach((it, i) => it.si = i + 1);
+                    renderInvoice(appState.invoice);
+                }
+            });
+            invoiceNoDisplay.onclick = () => {
+                const tmp = prompt('Invoice No:', invoiceNoDisplay.textContent || '');
+                if (tmp != null) { invoiceNoDisplay.textContent = tmp; appState.invoice.invoiceNo = tmp; }
+            };
+            orderNoDisplay.onclick = () => {
+                const tmp = prompt('Order No:', orderNoDisplay.textContent || '');
+                if (tmp != null) { orderNoDisplay.textContent = tmp; appState.invoice.orderNo = tmp; }
+            };
+            periodDisplay.onclick = () => {
+                const tmp = prompt('Period:', periodDisplay.textContent || '');
+                if (tmp != null) { periodDisplay.textContent = tmp; appState.invoice.period = tmp; }
+            };
+            headerLogo.addEventListener('click', () => {
+                const f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*';
+                f.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader(); reader.onload = ev => {
+                        appState.settings.logoDataUrl = ev.target.result;
+                        putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                        renderCompany();
+                    }; reader.readAsDataURL(file);
+                };
+                f.click();
+            });
+            $('billTo').addEventListener('input', () => { appState.invoice.billTo = $('billTo').innerHTML; });
+            (async function init() {
+                await openDB();
+                await loadSettingsFromDB();
+                const all = await allFromStore(STORE_INVOICES);
+                if (all && all.length) {
+                    appState.invoice = all.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+                } else {
+                    appState.invoice = newInvoiceTemplate();
+                }
+                renderInvoice(appState.invoice);
+                await showSavedList();
+            })();
+            function escapeHtmlForTextareaInput(s) { return String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function escapeHtmlForTextareaSame(s) { return (s || ''); }
+            function escapeHtmlForTextarea2(s) { return (stripTags(s || '')).replace(/\r/g, '').replace(/\n/g, '\n'); }
+            function escapeHtmlForTextarea(s) { return escapeHtmlForTextarea2(s); }
+        }); 
+    </script>
+</body>
+
+</html>
