@@ -408,7 +408,6 @@
 
         @media print {
 
-            /* Hide elements that should not be printed */
             header.toolbar,
             .right,
             footer,
@@ -421,7 +420,6 @@
                 display: none;
             }
 
-            /* Reset body and app container for a clean print layout */
             body,
             .app {
                 background: none !important;
@@ -429,7 +427,6 @@
                 padding: 0 !important;
             }
 
-            /* Ensure the layout containers and the paper take up the full width */
             .layout,
             .left,
             .paper-wrap,
@@ -443,10 +440,23 @@
                 box-shadow: none !important;
             }
 
-            /* Ensure contenteditable regions are not editable in print */
             [contenteditable="true"] {
                 border: none;
             }
+        }
+
+        #orderNoDisplay,
+        #periodDisplay {
+            display: inline-block;
+            min-width: 120px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            line-height: 1.4;
+            cursor: text;
         }
     </style>
 </head>
@@ -510,8 +520,9 @@
                                 <div style="margin-top:6px"><strong>Invoice Date:</strong> <span
                                         id="invoiceDateDisplay">-</span></div>
                                 <div style="margin-top:8px"><strong>Order No:</strong> <span
-                                        id="orderNoDisplay">-</span></div>
-                                <div style="margin-top:8px"><strong>Period:</strong> <span id="periodDisplay">-</span>
+                                        id="orderNoDisplay">-_________________-</span></div>
+                                <div style="margin-top:8px"><strong>Period:</strong> <span
+                                        id="periodDisplay">-_________________-</span>
                                 </div>
                                 <div style="margin-top:8px">Email: <span id="companyEmail">azizrehman00@gmail.com</span>
                                 </div>
