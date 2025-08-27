@@ -945,32 +945,48 @@
       </div>
     `;
                 modalRoot.style.display = 'block';
-                $('#settingsBackdrop').onclick = (e) => { if (e.target.id === 'settingsBackdrop') closeModal(); };
-                modalRoot.querySelector('#s_cancel').onclick = closeModal;
-                $('#s_clearlogo').onclick = () => {
-                    appState.settings.logoDataUrl = '';
-                    $('#s_logo_preview').src = '';
+
+                modalRoot.onclick = async (e) => {
+                    const targetId = e.target.id;
+
+                    if (targetId === 'settingsBackdrop' || targetId === 's_cancel') {
+                        closeModal();
+                    }
+
+                    if (targetId === 's_clearlogo') {
+                        appState.settings.logoDataUrl = '';
+                        modalRoot.querySelector('#s_logo_preview').src = '';
+                    }
+                    
+                    if (targetId === 's_save') {
+                        appState.settings.companyName = modalRoot.querySelector('#s_companyName').value || appState.settings.companyName;
+                        appState.settings.companyTag = modalRoot.querySelector('#s_companyTag').value || appState.settings.companyTag;
+                        appState.settings.companyEmail = modalRoot.querySelector('#s_companyEmail').value || appState.settings.companyEmail;
+                        appState.settings.vatPercent = Number(modalRoot.querySelector('#s_vat').value || 0);
+                        appState.settings.currency = modalRoot.querySelector('#s_currency').value || 'PKR';
+                        appState.settings.refPattern = modalRoot.querySelector('#s_refpattern').value || appState.settings.refPattern;
+                        if (modalRoot.querySelector('#s_logo_preview').src) appState.settings.logoDataUrl = modalRoot.querySelector('#s_logo_preview').src;
+                        
+                        await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
+                        
+                        closeModal();
+                        renderCompany();
+                        computeTotals();
+                        alert('Settings saved.');
+                    }
                 };
-                $('#s_logo').addEventListener('change', (ev) => {
-                    const f = ev.target.files[0];
-                    if (!f) return;
-                    const reader = new FileReader();
-                    reader.onload = e => { $('#s_logo_preview').src = e.target.result; appState.settings.logoDataUrl = e.target.result; };
-                    reader.readAsDataURL(f);
-                });
-                $('#s_save').onclick = async () => {
-                    appState.settings.companyName = $('#s_companyName').value || appState.settings.companyName;
-                    appState.settings.companyTag = $('#s_companyTag').value || appState.settings.companyTag;
-                    appState.settings.companyEmail = $('#s_companyEmail').value || appState.settings.companyEmail;
-                    appState.settings.vatPercent = Number($('#s_vat').value || 0);
-                    appState.settings.currency = $('#s_currency').value || 'PKR';
-                    appState.settings.refPattern = $('#s_refpattern').value || appState.settings.refPattern;
-                    if ($('#s_logo_preview').src) appState.settings.logoDataUrl = $('#s_logo_preview').src;
-                    await putStore(STORE_SETTINGS, { key: 'app_settings', value: appState.settings });
-                    closeModal();
-                    renderCompany();
-                    computeTotals();
-                    alert('Settings saved.');
+                
+                modalRoot.onchange = (e) => {
+                    if (e.target.id === 's_logo') {
+                        const f = e.target.files[0];
+                        if (!f) return;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            modalRoot.querySelector('#s_logo_preview').src = event.target.result;
+                            appState.settings.logoDataUrl = event.target.result;
+                        };
+                        reader.readAsDataURL(f);
+                    }
                 };
             }
             function closeModal() {
