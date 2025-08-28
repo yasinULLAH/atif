@@ -14,35 +14,35 @@ if (workbox) {
     workbox.precaching.precacheAndRoute([
     {
         "url": "icon-72.png",
-        "revision": "d7e2fea916659bbf271b4632f028fed5"
+        "revision": "e6d5da69b4352246f4c9af6db797a7f0"
     },
     {
         "url": "icon-96.png",
-        "revision": "f1bdf68dd999551760088eb79f5cbcba"
+        "revision": "bc795da2e1aadf04cf7c06cd5271bf2a"
     },
     {
         "url": "icon-128.png",
-        "revision": "1ec8980d1a4a78149a5ec7aac0a52a79"
+        "revision": "390ee4159b7083d1d0d71bc9785896c5"
     },
     {
         "url": "icon-144.png",
-        "revision": "70839b0a9ce56b64a72ca87b9c29f139"
+        "revision": "8d8a3b7bb3ac6bac526960452adae32b"
     },
     {
         "url": "icon-152.png",
-        "revision": "24fd20976f6dc6d81b99bdecd571fced"
+        "revision": "23718f36722fd2bacfdfce0b7b387917"
     },
     {
         "url": "icon-192.png",
-        "revision": "286958b45be08bdc916b8e3126b2203d"
+        "revision": "b1dad41d690ae853ee94ae4ca7bcecf9"
     },
     {
         "url": "icon-384.png",
-        "revision": "d3d46f60ff5014f7d85d047e1c55329f"
+        "revision": "12733b8b79bba21324ee8f5892056183"
     },
     {
         "url": "icon-512.png",
-        "revision": "1a98134a086859d517de611e9e0579bc"
+        "revision": "79cf656a0d5527bd318370d8a4ef1e3c"
     },
     {
         "url": ".gitattributes",
@@ -54,11 +54,15 @@ if (workbox) {
     },
     {
         "url": "favicon.ico",
-        "revision": "eb8c914dbcdc153b613ffe483e9f45c4"
+        "revision": "2ccb4c012761e3643dd2663117902357"
     },
     {
         "url": "index.html",
-        "revision": "9ac3c8add4d825e74c9845b9cef6f35e"
+        "revision": "727d3d1377099365116c36011c12d1e1"
+    },
+    {
+        "url": "index2.html",
+        "revision": "314f9b3fce8fdc8698502dc534951229"
     },
     {
         "url": "invoice.html",
@@ -66,7 +70,7 @@ if (workbox) {
     },
     {
         "url": "invoice2.html",
-        "revision": "a94486b91b91174feab729850cba9c40"
+        "revision": "cb65708d52ed07ebe66c2d90a3cc5ffa"
     },
     {
         "url": "invoice_343_2024-07-15 (1).png",
@@ -170,7 +174,11 @@ if (workbox) {
     },
     {
         "url": "logo.jpg",
-        "revision": "982b8101d5eff0244d33d0cfb47bd0a3"
+        "revision": "3c0de7adc79832d52f005d2c5db797b3"
+    },
+    {
+        "url": "logo2.jpg",
+        "revision": "7cab1f1374819dd82edc42d6a207be77"
     },
     {
         "url": "manifest.json",
@@ -181,12 +189,20 @@ if (workbox) {
         "revision": "ae51d343db40057d79a35f860555d2b1"
     },
     {
+        "url": "sign2.png",
+        "revision": "9384266ed2025d30beebfd48d9255989"
+    },
+    {
         "url": "signature.png",
         "revision": "987272800c52314669632b0ae42f4082"
     },
     {
+        "url": "stamp2.png",
+        "revision": "7070cf870574b5bcce95ea64a741bd17"
+    },
+    {
         "url": "sw.js",
-        "revision": "84bd65d466eb6d662b20cca55c5e3ee7"
+        "revision": "0eb0061e9d01e4713b84bef7e2f180fc"
     },
     {
         "url": "timesheet_Zubair_Ahmed_2025-08 (1).png",

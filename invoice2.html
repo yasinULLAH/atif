@@ -1,30 +1,23 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta
-        content="Invoice management system for Like Lion General Transport &amp; Maintenance, generating tax invoices, managing client and supplier data, with backup and restore functionality."
-        name="description" />
-    <meta
-        content="invoice, tax invoice, transport, maintenance, Like Lion, data management, backup, restore, Pakistan, Yasin Ullah"
-        name="keywords" />
-    <meta content="Yasin Ullah, Pakistan" name="author" />
-    <title>Like Lion Tax Invoice</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&amp;family=Mirza:wght@400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@400..700&amp;family=Noto+Nastaliq+Urdu:wght@400..700&amp;display=swap"
-        rel="stylesheet" />
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Invoice management system for Like Lion General Transport &amp; Maintenance, generating tax invoices, managing client and supplier data, with backup and restore functionality." name="description"/>
+<meta content="invoice, tax invoice, transport, maintenance, Like Lion, data management, backup, restore, Pakistan, Yasin Ullah" name="keywords"/>
+<meta content="Yasin Ullah, Pakistan" name="author"/>
+<title>Like Lion Tax Invoice</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&amp;family=Mirza:wght@400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@400..700&amp;family=Noto+Nastaliq+Urdu:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<style>
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #e74c3c;
@@ -460,315 +453,283 @@
             width: 275px !important;
         }
     </style>
-    <link href="manifest.json" rel="manifest">
-    <link href="favicon.ico" rel="icon" type="image/x-icon">
-    </link>
-    </link>
-    </link>
+<link href="manifest.json" rel="manifest"/>
+<link href="favicon.ico" rel="icon" type="image/x-icon"/>
+</link>
 </head>
-
 <body>
-    <main class="main-container" id="app">
-        <div class="actions-bar no-print">
-            <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-primary" id="new-invoice-btn"><i class="fas fa-file-alt me-1"></i>New</button>
-                <button class="btn btn-success" id="save-invoice-btn"><i class="fas fa-save me-1"></i>
+<main class="main-container" id="app">
+<div class="actions-bar no-print">
+<div class="d-flex flex-wrap gap-2">
+<button class="btn btn-primary" id="new-invoice-btn"><i class="fas fa-file-alt me-1"></i>New</button>
+<button class="btn btn-success" id="save-invoice-btn"><i class="fas fa-save me-1"></i>
                     Save</button>
-                <select class="form-select" id="invoice-history" style="width: auto;">
-                    <option selected="">Load</option>
-                </select>
-                <select class="form-select" id="customer-history" style="width: auto;">
-                    <option selected="">Load Cust..</option>
-                </select>
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-info" id="export-image-btn"><i class="fas fa-file-image me-1"></i> Export
+<select class="form-select" id="invoice-history" style="width: auto;">
+<option selected="">Load</option>
+</select>
+<select class="form-select" id="customer-history" style="width: auto;">
+<option selected="">Load Cust..</option>
+</select>
+</div>
+<div class="d-flex flex-wrap gap-2">
+<button class="btn btn-info" id="export-image-btn"><i class="fas fa-file-image me-1"></i> Export
                     Image</button>
-                <button class="btn btn-secondary" data-bs-target="#settingsModal" data-bs-toggle="modal"
-                    id="settings-btn"><i class="fas fa-cog me-1"></i> Settings</button>
-            </div>
-        </div>
-        <div class="printable-area" id="printable-area">
-            <header class="invoice-header">
-                <div class="company-info-logo">
-                    <img alt="Company Logo" class="company-logo" id="companyLogo" src="" style="display: none;" />
-                    <div class="company-title">
-                        <div class="arabic" id="companyNameAR"></div>
-                        <div class="english" id="companyNameEN"></div>
-                    </div>
-                </div>
-                <div class="date-ref-block">
-                    <div><label for="refNo">Ref No.</label><input class="form-control-sm" data-field="refNo" id="refNo"
-                            type="text" /></div>
-                    <div><label for="invoiceDate">Date:</label><input class="form-control-sm" data-field="invoiceDate"
-                            id="invoiceDate" type="date" /></div>
-                </div>
-            </header>
-            <h3 class="invoice-title">TAX INVOICE</h3>
-            <section class="client-supplier-info">
-                <div class="client-info info-block">
-                    <div>
-                        <label>Customer:</label>
-                        <input class="form-control-sm" data-field="customerName" id="customerName"
-                            placeholder="Customer Name" type="text" />
-                    </div>
-                    <div>
-                        <label>Address:</label>
-                        <input class="form-control-sm" data-field="customerAddress" id="customerAddress"
-                            placeholder="Customer Address" type="text" />
-                    </div>
-                    <div>
-                        <label>PO Box:</label>
-                        <input class="form-control-sm" data-field="customerPOBox" id="customerPOBox"
-                            placeholder="PO Box" type="text" />
-                    </div>
-                    <div>
-                        <label>Customer TRN:</label>
-                        <input class="form-control-sm" data-field="customerTRN" id="customerTRN"
-                            placeholder="Customer TRN" type="text" />
-                    </div>
-                    <div>
-                        <label>Supplier Name:</label>
-                        <input class="form-control-sm" data-field="supplierName" id="supplierName"
-                            placeholder="Supplier Name" readonly="" type="text" />
-                    </div>
-                    <div>
-                        <label>Supplier Address:</label>
-                        <input class="form-control-sm" data-field="supplierAddress" id="supplierAddress"
-                            placeholder="Supplier Address" readonly="" type="text" />
-                    </div>
-                    <div>
-                        <label>PO Box:</label>
-                        <input class="form-control-sm" data-field="supplierPOBox" id="supplierPOBox"
-                            placeholder="Supplier PO Box" readonly="" type="text" />
-                    </div>
-                    <div>
-                        <label>E mail:</label>
-                        <input class="form-control-sm" data-field="supplierEmail" id="supplierEmail"
-                            placeholder="Supplier Email" readonly="" type="email" />
-                    </div>
-                    <div>
-                        <label>Supplier TRN:</label>
-                        <input class="form-control-sm" data-field="supplierTRN" id="supplierTRN"
-                            placeholder="Supplier TRN" readonly="" type="text" />
-                    </div>
-                </div>
-                <div class="invoice-details info-block">
-                    <div>
-                        <label for="invoiceNo">Invoice No:</label>
-                        <input class="form-control-sm" data-field="invoiceNo" id="invoiceNo" type="text" />
-                    </div>
-                    <div>
-                        <label for="invoiceDateDetail">Invoice Date:</label>
-                        <input class="form-control-sm" data-field="invoiceDateDetail" id="invoiceDateDetail"
-                            type="date" />
-                    </div>
-                    <div>
-                        <label for="orderNo">Order No:</label>
-                        <input class="form-control-sm" data-field="orderNo" id="orderNo" type="text" />
-                    </div>
-                    <div>
-                        <label for="period">Period:</label>
-                        <input class="form-control-sm" data-field="period" id="period" type="text" />
-                    </div>
-                </div>
-            </section>
-            <div class="table-actions no-print">
-                <button class="btn btn-sm btn-outline-primary" id="add-item-btn"><i class="fas fa-plus me-1"></i> Add
+<button class="btn btn-secondary" data-bs-target="#settingsModal" data-bs-toggle="modal" id="settings-btn"><i class="fas fa-cog me-1"></i> Settings</button>
+</div>
+</div>
+<div class="printable-area" id="printable-area">
+<header class="invoice-header">
+<div class="company-info-logo">
+<img alt="Company Logo" class="company-logo" id="companyLogo" src="" style="display: none;"/>
+<div class="company-title">
+<div class="arabic" id="companyNameAR"></div>
+<div class="english" id="companyNameEN"></div>
+</div>
+</div>
+<div class="date-ref-block">
+<div><label for="refNo">Ref No.</label><input class="form-control-sm" data-field="refNo" id="refNo" type="text"/></div>
+<div><label for="invoiceDate">Date:</label><input class="form-control-sm" data-field="invoiceDate" id="invoiceDate" type="date"/></div>
+</div>
+</header>
+<h3 class="invoice-title">TAX INVOICE</h3>
+<section class="client-supplier-info">
+<div class="client-info info-block">
+<div>
+<label>Customer:</label>
+<input class="form-control-sm" data-field="customerName" id="customerName" placeholder="Customer Name" type="text"/>
+</div>
+<div>
+<label>Address:</label>
+<input class="form-control-sm" data-field="customerAddress" id="customerAddress" placeholder="Customer Address" type="text"/>
+</div>
+<div>
+<label>PO Box:</label>
+<input class="form-control-sm" data-field="customerPOBox" id="customerPOBox" placeholder="PO Box" type="text"/>
+</div>
+<div>
+<label>Customer TRN:</label>
+<input class="form-control-sm" data-field="customerTRN" id="customerTRN" placeholder="Customer TRN" type="text"/>
+</div>
+<div>
+<label>Supplier Name:</label>
+<input class="form-control-sm" data-field="supplierName" id="supplierName" placeholder="Supplier Name" readonly="" type="text"/>
+</div>
+<div>
+<label>Supplier Address:</label>
+<input class="form-control-sm" data-field="supplierAddress" id="supplierAddress" placeholder="Supplier Address" readonly="" type="text"/>
+</div>
+<div>
+<label>PO Box:</label>
+<input class="form-control-sm" data-field="supplierPOBox" id="supplierPOBox" placeholder="Supplier PO Box" readonly="" type="text"/>
+</div>
+<div>
+<label>E mail:</label>
+<input class="form-control-sm" data-field="supplierEmail" id="supplierEmail" placeholder="Supplier Email" readonly="" type="email"/>
+</div>
+<div>
+<label>Supplier TRN:</label>
+<input class="form-control-sm" data-field="supplierTRN" id="supplierTRN" placeholder="Supplier TRN" readonly="" type="text"/>
+</div>
+</div>
+<div class="invoice-details info-block">
+<div>
+<label for="invoiceNo">Invoice No:</label>
+<input class="form-control-sm" data-field="invoiceNo" id="invoiceNo" type="text"/>
+</div>
+<div>
+<label for="invoiceDateDetail">Invoice Date:</label>
+<input class="form-control-sm" data-field="invoiceDateDetail" id="invoiceDateDetail" type="date"/>
+</div>
+<div>
+<label for="orderNo">Order No:</label>
+<input class="form-control-sm" data-field="orderNo" id="orderNo" type="text"/>
+</div>
+<div>
+<label for="period">Period:</label>
+<input class="form-control-sm" data-field="period" id="period" type="text"/>
+</div>
+</div>
+</section>
+<div class="table-actions no-print">
+<button class="btn btn-sm btn-outline-primary" id="add-item-btn"><i class="fas fa-plus me-1"></i> Add
                     Item</button>
-            </div>
-            <section class="table-responsive">
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">SI</th>
-                            <th rowspan="2">Item Description</th>
-                            <th rowspan="2">Month</th>
-                            <th rowspan="2">Vehicle</th>
-                            <th rowspan="2">UOM</th>
-                            <th>Rate Per Month</th>
-                            <th colspan="4">Rate Per Hour</th>
-                            <th rowspan="2">Total Amount</th>
-                            <th class="no-print" rowspan="2">Actions</th>
-                        </tr>
-                        <tr>
-                            <th>260</th>
-                            <th>Normal Rate</th>
-                            <th>Overtime Rate</th>
-                            <th>Normal Hour</th>
-                            <th>Overtime Hour</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invoice-items-body">
-                        <!-- Invoice items will be appended here -->
-                    </tbody>
-                </table>
-            </section>
-            <section class="summary-signature-section">
-                <div class="summary-block">
-                    <div class="total-amount-in-words" id="amountInWords"></div>
-                </div>
-                <div>
-                    <div class="summary-line">
-                        <label>Basic Amount</label>
-                        <input id="basicAmount" readonly="" type="text" />
-                    </div>
-                    <div class="summary-line">
-                        <label>Vat Amount</label>
-                        <input id="vatAmount" readonly="" type="text" />
-                    </div>
-                    <div class="summary-line total-amount-line">
-                        <label>Total Amount</label>
-                        <input id="totalAmount" readonly="" type="text" />
-                    </div>
-                </div>
-            </section>
-            <section class="summary-signature-section mt-4">
-                <div class="signature-block">
-                    <input data-field="authorizedSig" id="authorizedSig" placeholder="Authorized Sig" type="text" />
-                    <img class="signature-image" id="authorizedSigImg" style="display:none; max-height:50px;" />
-                </div>
-                <div class="signature-block">
-                    <input data-field="receiverSig" id="receiverSig" placeholder="Receiver Sig" type="text" />
-                    <img class="signature-image" id="receiverSigImg" style="display:none; max-height:50px;" />
-                </div>
-            </section>
-            <section class="company-stamp mt-4">
-                <img alt="Company Stamp" id="companyStamp" src="" style="display: none;" />
-            </section>
-            <footer class="footer-contact">
-                <div>
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <span id="footerAddressLine1"></span> <br />
-                        <span id="footerAddressLine2"></span> <br />
-                        <span id="footerAddressLine3"></span>
-                    </div>
-                </div>
-                <div>
-                    <div>
-                        <div><i class="fas fa-phone"></i> <span id="footerMobile"></span></div>
-                        <div><i class="fas fa-envelope"></i> <span id="footerEmail"></span>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    </main>
-    <div aria-hidden="true" aria-labelledby="settingsModalLabel" class="modal fade no-print" id="settingsModal"
-        tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel">Admin Panel</h5>
-                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs" id="settingsTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button aria-controls="company-info" aria-selected="true" class="nav-link active"
-                                data-bs-target="#company-info" data-bs-toggle="tab" id="company-info-tab" role="tab"
-                                type="button">Company Info</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button aria-controls="data-management" aria-selected="false" class="nav-link"
-                                data-bs-target="#data-management" data-bs-toggle="tab" id="data-management-tab"
-                                role="tab" type="button">Backup &amp; Restore</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="settingsTabContent">
-                        <div aria-labelledby="company-info-tab" class="tab-pane fade show active" id="company-info"
-                            role="tabpanel" style="padding-top: 1.5rem;">
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyNameAR">Company Name (Arabic)</label>
-                                <input class="form-control" id="settingsCompanyNameAR" type="text" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyNameEN">Company Name (English)</label>
-                                <input class="form-control" id="settingsCompanyNameEN" type="text" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyAddress">Company Address</label>
-                                <input class="form-control" id="settingsCompanyAddress" type="text" />
-                                <small class="form-text text-muted">Separate address lines with commas for display in
+</div>
+<section class="table-responsive">
+<table class="invoice-table">
+<thead>
+<tr>
+<th rowspan="2">SI</th>
+<th rowspan="2">Item Description</th>
+<th rowspan="2">Month</th>
+<th rowspan="2">Vehicle</th>
+<th rowspan="2">UOM</th>
+<th>Rate Per Month</th>
+<th colspan="4">Rate Per Hour</th>
+<th rowspan="2">Total Amount</th>
+<th class="no-print" rowspan="2">Actions</th>
+</tr>
+<tr>
+<th>260</th>
+<th>Normal Rate</th>
+<th>Overtime Rate</th>
+<th>Normal Hour</th>
+<th>Overtime Hour</th>
+</tr>
+</thead>
+<tbody id="invoice-items-body">
+<!-- Invoice items will be appended here -->
+</tbody>
+</table>
+</section>
+<section class="summary-signature-section">
+<div class="summary-block">
+<div class="total-amount-in-words" id="amountInWords"></div>
+</div>
+<div>
+<div class="summary-line">
+<label>Basic Amount</label>
+<input id="basicAmount" readonly="" type="text"/>
+</div>
+<div class="summary-line">
+<label>Vat Amount</label>
+<input id="vatAmount" readonly="" type="text"/>
+</div>
+<div class="summary-line total-amount-line">
+<label>Total Amount</label>
+<input id="totalAmount" readonly="" type="text"/>
+</div>
+</div>
+</section>
+<section class="summary-signature-section mt-4">
+<div class="signature-block">
+<input data-field="authorizedSig" id="authorizedSig" placeholder="Authorized Sig" type="text"/>
+<img class="signature-image" id="authorizedSigImg" style="display:none; max-height:50px;"/>
+</div>
+<div class="signature-block">
+<input data-field="receiverSig" id="receiverSig" placeholder="Receiver Sig" type="text"/>
+<img class="signature-image" id="receiverSigImg" style="display:none; max-height:50px;"/>
+</div>
+</section>
+<section class="company-stamp mt-4">
+<img alt="Company Stamp" id="companyStamp" src="" style="display: none;"/>
+</section>
+<footer class="footer-contact">
+<div>
+<i class="fas fa-map-marker-alt"></i>
+<div>
+<span id="footerAddressLine1"></span> <br/>
+<span id="footerAddressLine2"></span> <br/>
+<span id="footerAddressLine3"></span>
+</div>
+</div>
+<div>
+<div>
+<div><i class="fas fa-phone"></i> <span id="footerMobile"></span></div>
+<div><i class="fas fa-envelope"></i> <span id="footerEmail"></span>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</main>
+<div aria-hidden="true" aria-labelledby="settingsModalLabel" class="modal fade no-print" id="settingsModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="settingsModalLabel">Admin Panel</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<ul class="nav nav-tabs" id="settingsTab" role="tablist">
+<li class="nav-item" role="presentation">
+<button aria-controls="company-info" aria-selected="true" class="nav-link active" data-bs-target="#company-info" data-bs-toggle="tab" id="company-info-tab" role="tab" type="button">Company Info</button>
+</li>
+<li class="nav-item" role="presentation">
+<button aria-controls="data-management" aria-selected="false" class="nav-link" data-bs-target="#data-management" data-bs-toggle="tab" id="data-management-tab" role="tab" type="button">Backup &amp; Restore</button>
+</li>
+</ul>
+<div class="tab-content" id="settingsTabContent">
+<div aria-labelledby="company-info-tab" class="tab-pane fade show active" id="company-info" role="tabpanel" style="padding-top: 1.5rem;">
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyNameAR">Company Name (Arabic)</label>
+<input class="form-control" id="settingsCompanyNameAR" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyNameEN">Company Name (English)</label>
+<input class="form-control" id="settingsCompanyNameEN" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyAddress">Company Address</label>
+<input class="form-control" id="settingsCompanyAddress" type="text"/>
+<small class="form-text text-muted">Separate address lines with commas for display in
                                     footer (e.g., "Line 1, Line 2, Line 3")</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyPOBox">Company P.O. Box</label>
-                                <input class="form-control" id="settingsCompanyPOBox" type="text" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyTRN">Company TRN</label>
-                                <input class="form-control" id="settingsCompanyTRN" type="text" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyMobile">Mobile No</label>
-                                <input class="form-control" id="settingsCompanyMobile" type="text" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyEmail">Email</label>
-                                <input class="form-control" id="settingsCompanyEmail" type="email" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsVatRate">VAT Rate (%)</label>
-                                <input class="form-control" id="settingsVatRate" step="0.01" type="number" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyLogo">Company Logo</label>
-                                <input accept="image/*" class="form-control" id="settingsCompanyLogo" type="file" />
-                                <img alt="Logo Preview" class="logo-preview" id="logoPreview" src="#"
-                                    style="display: none;" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsCompanyStamp">Company Stamp</label>
-                                <input accept="image/*" class="form-control" id="settingsCompanyStamp" type="file" />
-                                <img alt="Stamp Preview" class="logo-preview" id="stampPreview" src="#"
-                                    style="display: none;" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsAuthorizedSignature">Authorized Signature
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyPOBox">Company P.O. Box</label>
+<input class="form-control" id="settingsCompanyPOBox" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyTRN">Company TRN</label>
+<input class="form-control" id="settingsCompanyTRN" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyMobile">Mobile No</label>
+<input class="form-control" id="settingsCompanyMobile" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyEmail">Email</label>
+<input class="form-control" id="settingsCompanyEmail" type="email"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsVatRate">VAT Rate (%)</label>
+<input class="form-control" id="settingsVatRate" step="0.01" type="number"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyLogo">Company Logo</label>
+<input accept="image/*" class="form-control" id="settingsCompanyLogo" type="file"/>
+<img alt="Logo Preview" class="logo-preview" id="logoPreview" src="#" style="display: none;"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsCompanyStamp">Company Stamp</label>
+<input accept="image/*" class="form-control" id="settingsCompanyStamp" type="file"/>
+<img alt="Stamp Preview" class="logo-preview" id="stampPreview" src="#" style="display: none;"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsAuthorizedSignature">Authorized Signature
                                     Image</label>
-                                <input accept="image/*" class="form-control" id="settingsAuthorizedSignature"
-                                    type="file" />
-                                <img alt="Authorized Signature Preview" class="logo-preview" id="authSigPreview" src="#"
-                                    style="display: none;" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="settingsReceiverSignature">Receiver Signature
+<input accept="image/*" class="form-control" id="settingsAuthorizedSignature" type="file"/>
+<img alt="Authorized Signature Preview" class="logo-preview" id="authSigPreview" src="#" style="display: none;"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="settingsReceiverSignature">Receiver Signature
                                     Image</label>
-                                <input accept="image/*" class="form-control" id="settingsReceiverSignature"
-                                    type="file" />
-                                <img alt="Receiver Signature Preview" class="logo-preview" id="recSigPreview" src="#"
-                                    style="display: none;" />
-                            </div>
-                            <div class="mt-4 d-flex justify-content-end">
-                                <button class="btn btn-primary" id="save-settings-btn" type="button">Save Company
+<input accept="image/*" class="form-control" id="settingsReceiverSignature" type="file"/>
+<img alt="Receiver Signature Preview" class="logo-preview" id="recSigPreview" src="#" style="display: none;"/>
+</div>
+<div class="mt-4 d-flex justify-content-end">
+<button class="btn btn-primary" id="save-settings-btn" type="button">Save Company
                                     Info</button>
-                            </div>
-                        </div>
-                        <div aria-labelledby="data-management-tab" class="tab-pane fade" id="data-management"
-                            role="tabpanel" style="padding-top: 1.5rem;">
-                            <p>Create a full backup of all settings and invoice records, or restore the application from
+</div>
+</div>
+<div aria-labelledby="data-management-tab" class="tab-pane fade" id="data-management" role="tabpanel" style="padding-top: 1.5rem;">
+<p>Create a full backup of all settings and invoice records, or restore the application from
                                 a backup file.</p>
-                            <div class="d-grid gap-2 col-md-8 mx-auto">
-                                <button class="btn btn-success" id="backup-all-btn"><i
-                                        class="fas fa-download me-2"></i>Backup All Data</button>
-                                <button class="btn btn-danger" id="restore-all-btn"><i
-                                        class="fas fa-upload me-2"></i>Restore from Backup</button>
-                                <input accept=".json" id="restore-file-input" type="file" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script crossorigin="anonymous" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+<div class="d-grid gap-2 col-md-8 mx-auto">
+<button class="btn btn-success" id="backup-all-btn"><i class="fas fa-download me-2"></i>Backup All Data</button>
+<button class="btn btn-danger" id="restore-all-btn"><i class="fas fa-upload me-2"></i>Restore from Backup</button>
+<input accept=".json" id="restore-file-input" type="file"/>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+</div>
+</div>
+</div>
+</div>
+<script crossorigin="anonymous" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         document.addEventListener('DOMContentLoaded', () => {
             const DB_NAME = 'LikeLionInvoiceDB_YasinUllah_V1';
             const DB_VERSION = 1;
@@ -1432,24 +1393,23 @@
             initDB();
         });
     </script>
-    <script type="module">
-        import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
 
-        const swUrl = './sw.js';
-        const wb = new Workbox(swUrl);
+<script type="module">
+  import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
 
-        wb.addEventListener('waiting', (event) => {
-            console.log('A new service worker is waiting to activate.');
-            wb.messageSW({ type: 'SKIP_WAITING' });
-        });
+  const swUrl = './sw.js';
+  const wb = new Workbox(swUrl);
 
-        wb.addEventListener('controlling', (event) => {
-            console.log('The new service worker is now in control. Reloading page for updates...');
-            window.location.reload();
-        });
+  wb.addEventListener('waiting', (event) => {
+    console.log('A new service worker is waiting to activate.');
+    wb.messageSW({ type: 'SKIP_WAITING' });
+  });
 
-        wb.register();
-    </script>
-</body>
+  wb.addEventListener('controlling', (event) => {
+    console.log('The new service worker is now in control. Reloading page for updates...');
+    window.location.reload();
+  });
 
+  wb.register();
+</script></body>
 </html>

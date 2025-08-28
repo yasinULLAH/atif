@@ -1,11 +1,11 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
 
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>ASR Prince — Transport Invoice App (Yasin Ullah)</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>ASR Prince — Transport Invoice App (Yasin Ullah)</title>
+<style>
         :root {
             --accent: #1a2b6f;
             --muted: #666;
@@ -459,163 +459,154 @@
             cursor: text;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="manifest.json" rel="manifest"/><link href="favicon.ico" rel="icon" type="image/x-icon"/></head>
 <body>
-    <div class="app">
-        <header class="toolbar">
-            <div class="brand">
-                <img id="companyLogo" alt="logo" src="" />
-                <div>
-                    <h1 id="companyName">ASR PRINCE TRANSPORT AND GENERAL CONTRACTING</h1>
-                    <div id="companyTag" class="muted">اسر پرنس للنقليات والمقاولات العامة</div>
-                </div>
-            </div>
-            <div class="controls">
-                <div class="toolbar-actions">
-                    <button class="primary" id="newInvoiceBtn">New Invoice</button>
-                    <button id="saveInvoiceBtn">Save</button>
-                    <button id="printBtn">Print / PDF</button>
-                    <button id="exportCsvBtn">Export CSV</button>
-                    <button id="exportJsonBtn">Backup JSON</button>
-                    <button id="importJsonBtn">Restore JSON</button>
-                    <button id="exportImageBtn">Export Image</button>
-                    <button id="settingsBtn">Settings</button>
-                </div>
-            </div>
-        </header>
-        <div class="layout">
-            <div class="left panel">
-                <div class="paper-wrap">
-                    <div class="paper" id="paper">
-                        <div class="invoice-head">
-                            <div style="width:160px">
-                                <img id="headerLogo" src="" alt="logo"
-                                    style="width:160px;height:auto;object-fit:contain" />
-                            </div>
-                            <div class="titles">
-                                <div class="inv-sub" contenteditable="true" id="arabicTitle">اسر پرنس للنقليات
+<div class="app">
+<header class="toolbar">
+<div class="brand">
+<img alt="logo" id="companyLogo" src=""/>
+<div>
+<h1 id="companyName">ASR PRINCE TRANSPORT AND GENERAL CONTRACTING</h1>
+<div class="muted" id="companyTag">اسر پرنس للنقليات والمقاولات العامة</div>
+</div>
+</div>
+<div class="controls">
+<div class="toolbar-actions">
+<button class="primary" id="newInvoiceBtn">New Invoice</button>
+<button id="saveInvoiceBtn">Save</button>
+<button id="printBtn">Print / PDF</button>
+<button id="exportCsvBtn">Export CSV</button>
+<button id="exportJsonBtn">Backup JSON</button>
+<button id="importJsonBtn">Restore JSON</button>
+<button id="exportImageBtn">Export Image</button>
+<button id="settingsBtn">Settings</button>
+</div>
+</div>
+</header>
+<div class="layout">
+<div class="left panel">
+<div class="paper-wrap">
+<div class="paper" id="paper">
+<div class="invoice-head">
+<div style="width:160px">
+<img alt="logo" id="headerLogo" src="" style="width:160px;height:auto;object-fit:contain"/>
+</div>
+<div class="titles">
+<div class="inv-sub" contenteditable="true" id="arabicTitle">اسر پرنس للنقليات
                                     والمقاولات العامه</div>
-                                <div class="inv-title" contenteditable="true" id="englishTitle">ASR PRINCE TRANSPORT AND
+<div class="inv-title" contenteditable="true" id="englishTitle">ASR PRINCE TRANSPORT AND
                                     GENERAL CONTRACTING</div>
-                            </div>
-                            <div style="width:220px;text-align:right">
-                                <div class="box">
-                                    <div><strong>Ref No.</strong> <span id="refNo">-</span></div>
-                                    <div style="margin-top:6px"><strong>Date:</strong> <input type="date"
-                                            id="invoiceDate" /></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid">
-                            <div class="leftbox box">
-                                <div id="billTo" contenteditable="true" style="min-height:70px">
-                                    <strong>Bill To / کس کو: </strong>
-                                    <p>Client Name: </p>
-                                    <p>Address line: </p>
-                                </div>
-                            </div>
-                            <div class="rightbox box">
-                                <div><strong>Invoice No:</strong> <span id="invoiceNoDisplay">-</span></div>
-                                <div style="margin-top:6px"><strong>Invoice Date:</strong> <span
-                                        id="invoiceDateDisplay">-</span></div>
-                                <div style="margin-top:8px"><strong>Order No:</strong> <span
-                                        id="orderNoDisplay">-_________________-</span></div>
-                                <div style="margin-top:8px"><strong>Period:</strong> <span
-                                        id="periodDisplay">-_________________-</span>
-                                </div>
-                                <div style="margin-top:8px">Email: <span id="companyEmail">azizrehman00@gmail.com</span>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="items-table" id="items">
-                            <thead>
-                                <tr>
-                                    <th style="width:40px">SI</th>
-                                    <th>Item Description</th>
-                                    <th style="width:120px">Month</th>
-                                    <th style="width:90px">Vehicle</th>
-                                    <th style="width:72px">UOM</th>
-                                    <th style="width:98px">Rate / Month</th>
-                                    <th style="width:98px">Normal Rate</th>
-                                    <th style="width:98px">Overtime Rate</th>
-                                    <th style="width:98px">Normal Hour</th>
-                                    <th style="width:98px">Overtime Hour</th>
-                                    <th style="width:120px">Total Amount</th>
-                                    <th style="width:50px"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsBody"></tbody>
-                        </table>
-                        <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
-                            <button class="small" id="addRowBtn">+ Add Row</button>
-                            <button class="small" id="clearRowsBtn">Clear Rows</button>
-                            <div style="flex:1"></div>
-                        </div>
-                        <div class="totals">
-                            <table>
-                                <tr>
-                                    <td style="min-width:160px">Basic Amount</td>
-                                    <td id="basicAmount">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>VAT (<span id="vatPercentDisplay">0</span>%)</td>
-                                    <td id="vatAmount">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total Amount</strong></td>
-                                    <td id="grandTotal">0.00</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div style="margin-top:8px;border-top:1px solid #ddd;padding-top:10px">
-                            <div><strong>Amount in words:</strong> <span id="amountWords">Zero</span></div>
-                        </div>
-                        <div class="watermark" id="watermark">ASR PRINCE</div>
-                        <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center">
-                            <div style="text-align: center;">
-                                <img src="sign2.png" alt="Signature"
-                                    style="height: 50px;display: block;margin-bottom: -56px;position: relative;z-index: 2;left: 32px;">
-                                <img src="stamp2.png" alt="Stamp"
-                                    style="height: 60px; display: block; position: relative; z-index: 1;">
-                                <div style="border-top: 1px solid black; padding-top: 2px;">Authorized Sig</div>
-                            </div>
-                            <div>Receiver Sig____________</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="right">
-                <div class="panel">
-                    <h3>Drafts & Saved Invoices</h3>
-                    <div style="display:flex;gap:8px;margin-bottom:8px">
-                        <input id="searchInput" placeholder="Search by invoice no / client / order"
-                            style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc" />
-                        <button id="filterBtn">Filter</button>
-                    </div>
-                    <div class="list" id="savedList"></div>
-                </div>
-                <div class="panel" style="margin-top:12px">
-                    <h3>Quick Settings</h3>
-                    <label>Currency</label>
-                    <input type="text" id="currencyInput" placeholder="PKR" />
-                    <label>VAT %</label>
-                    <input type="number" id="vatInput" min="0" max="100" />
-                    <label>Default Ref No</label>
-                    <input type="text" id="refPattern" placeholder="INV-{yyyy}{mm}{dd}-{seq}" />
-                    <div style="margin-top:8px;display:flex;gap:8px">
-                        <button id="applyQuickSettings" class="primary small">Apply</button>
-                        <button class="small" id="resetSettings">Reset</button>
-                    </div>
-                    <div class="small-muted" style="margin-top:8px">Ref pattern tokens: {yyyy},{mm},{dd},{seq}</div>
-                </div>
-            </div>
-        </div>
-        <footer class="muted">Single-file Invoice app • Data stored locally in your browser (IndexedDB)</footer>
-    </div>
-    <div id="modalRoot" style="display:none"></div>
-    <script>
+</div>
+<div style="width:220px;text-align:right">
+<div class="box">
+<div><strong>Ref No.</strong> <span id="refNo">-</span></div>
+<div style="margin-top:6px"><strong>Date:</strong> <input id="invoiceDate" type="date"/></div>
+</div>
+</div>
+</div>
+<div class="grid">
+<div class="leftbox box">
+<div contenteditable="true" id="billTo" style="min-height:70px">
+<strong>Bill To / کس کو: </strong>
+<p>Client Name: </p>
+<p>Address line: </p>
+</div>
+</div>
+<div class="rightbox box">
+<div><strong>Invoice No:</strong> <span id="invoiceNoDisplay">-</span></div>
+<div style="margin-top:6px"><strong>Invoice Date:</strong> <span id="invoiceDateDisplay">-</span></div>
+<div style="margin-top:8px"><strong>Order No:</strong> <span id="orderNoDisplay">-_________________-</span></div>
+<div style="margin-top:8px"><strong>Period:</strong> <span id="periodDisplay">-_________________-</span>
+</div>
+<div style="margin-top:8px">Email: <span id="companyEmail">azizrehman00@gmail.com</span>
+</div>
+</div>
+</div>
+<table class="items-table" id="items">
+<thead>
+<tr>
+<th style="width:40px">SI</th>
+<th>Item Description</th>
+<th style="width:120px">Month</th>
+<th style="width:90px">Vehicle</th>
+<th style="width:72px">UOM</th>
+<th style="width:98px">Rate / Month</th>
+<th style="width:98px">Normal Rate</th>
+<th style="width:98px">Overtime Rate</th>
+<th style="width:98px">Normal Hour</th>
+<th style="width:98px">Overtime Hour</th>
+<th style="width:120px">Total Amount</th>
+<th style="width:50px"></th>
+</tr>
+</thead>
+<tbody id="itemsBody"></tbody>
+</table>
+<div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+<button class="small" id="addRowBtn">+ Add Row</button>
+<button class="small" id="clearRowsBtn">Clear Rows</button>
+<div style="flex:1"></div>
+</div>
+<div class="totals">
+<table>
+<tr>
+<td style="min-width:160px">Basic Amount</td>
+<td id="basicAmount">0.00</td>
+</tr>
+<tr>
+<td>VAT (<span id="vatPercentDisplay">0</span>%)</td>
+<td id="vatAmount">0.00</td>
+</tr>
+<tr>
+<td><strong>Total Amount</strong></td>
+<td id="grandTotal">0.00</td>
+</tr>
+</table>
+</div>
+<div style="margin-top:8px;border-top:1px solid #ddd;padding-top:10px">
+<div><strong>Amount in words:</strong> <span id="amountWords">Zero</span></div>
+</div>
+<div class="watermark" id="watermark">ASR PRINCE</div>
+<div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center">
+<div style="text-align: center;">
+<img alt="Signature" src="sign2.png" style="height: 50px;display: block;margin-bottom: -56px;position: relative;z-index: 2;left: 32px;"/>
+<img alt="Stamp" src="stamp2.png" style="height: 60px; display: block; position: relative; z-index: 1;"/>
+<div style="border-top: 1px solid black; padding-top: 2px;">Authorized Sig</div>
+</div>
+<div>Receiver Sig____________</div>
+</div>
+</div>
+</div>
+</div>
+<div class="right">
+<div class="panel">
+<h3>Drafts &amp; Saved Invoices</h3>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+<input id="searchInput" placeholder="Search by invoice no / client / order" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc"/>
+<button id="filterBtn">Filter</button>
+</div>
+<div class="list" id="savedList"></div>
+</div>
+<div class="panel" style="margin-top:12px">
+<h3>Quick Settings</h3>
+<label>Currency</label>
+<input id="currencyInput" placeholder="PKR" type="text"/>
+<label>VAT %</label>
+<input id="vatInput" max="100" min="0" type="number"/>
+<label>Default Ref No</label>
+<input id="refPattern" placeholder="INV-{yyyy}{mm}{dd}-{seq}" type="text"/>
+<div style="margin-top:8px;display:flex;gap:8px">
+<button class="primary small" id="applyQuickSettings">Apply</button>
+<button class="small" id="resetSettings">Reset</button>
+</div>
+<div class="small-muted" style="margin-top:8px">Ref pattern tokens: {yyyy},{mm},{dd},{seq}</div>
+</div>
+</div>
+</div>
+<footer class="muted">Single-file Invoice app • Data stored locally in your browser (IndexedDB)</footer>
+</div>
+<div id="modalRoot" style="display:none"></div>
+<script>
         /* -----------------------
           App code — all in single file
            - DOMContentLoaded wrapper to avoid "null" element errors
@@ -1275,6 +1266,22 @@
             function escapeHtmlForTextarea(s) { return escapeHtmlForTextarea2(s); }
         }); 
     </script>
-</body>
+<script type="module">
+  import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
 
+  const swUrl = './sw.js';
+  const wb = new Workbox(swUrl);
+
+  wb.addEventListener('waiting', (event) => {
+    console.log('A new service worker is waiting to activate.');
+    wb.messageSW({ type: 'SKIP_WAITING' });
+  });
+
+  wb.addEventListener('controlling', (event) => {
+    console.log('The new service worker is now in control. Reloading page for updates...');
+    window.location.reload();
+  });
+
+  wb.register();
+</script></body>
 </html>
