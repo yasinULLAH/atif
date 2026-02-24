@@ -12,7 +12,7 @@
             --muted: #666;
             --border: #333;
             --bg: #fff;
-            --paper-max-width: 900px;
+            --paper-max-width: 100%;
         }
 
         html,
@@ -25,7 +25,7 @@
         }
 
         .app {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 18px auto;
             padding: 14px;
             display: grid;
@@ -108,18 +108,22 @@
         }
 
         .right {
-            width: 380px
+            width: 380px;
+        }
+
+        .right.collapsed {
+            display: none;
         }
 
         .paper-wrap {
             display: flex;
-            justify-content: center
+            justify-content: flex-start;
         }
 
         .paper {
             width: 100%;
             max-width: var(--paper-max-width);
-            margin: 0 auto;
+            margin: 0;
             padding: 18px;
             border: 2px solid var(--border);
             background: #fff;
@@ -477,6 +481,7 @@
             </div>
             <div class="controls">
                 <div class="toolbar-actions">
+                    <button class="secondary" id="toggleRightBtn">☰ History &amp; Settings</button>
                     <button class="primary" id="newInvoiceBtn">New Invoice</button>
                     <button id="saveInvoiceBtn">Save</button>
                     <button id="printBtn">Print / PDF</button>
@@ -589,7 +594,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right">
+            <div class="right collapsed">
                 <div class="panel">
                     <h3>Drafts &amp; Saved Invoices</h3>
                     <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -627,6 +632,8 @@
         ------------------------*/
         document.addEventListener('DOMContentLoaded', () => {
             const $ = id => document.getElementById(id);
+            const toggleRightBtn = $('toggleRightBtn');
+            const rightPanel = document.querySelector('.right');
             const money = n => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const uid = (len = 10) => Math.random().toString(36).slice(2, 2 + len);
             const nowISO = () => new Date().toISOString();
@@ -1192,6 +1199,7 @@
             importJsonBtn.onclick = importJSONBackup;
             exportCsvBtn.onclick = exportCSV;
             settingsBtn.onclick = openSettingsModal;
+            toggleRightBtn.onclick = () => rightPanel.classList.toggle('collapsed');
             exportImageBtn.onclick = exportToImageHandler;
             printBtn.ondblclick = exportToPDFHandler;
             searchInput.oninput = () => showSavedList(searchInput.value);
@@ -1278,6 +1286,7 @@
             function escapeHtmlForTextarea(s) { return escapeHtmlForTextarea2(s); }
         }); 
     </script>
+
     <script type="module">
         import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
 

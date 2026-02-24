@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Invoice Statement App</title>
+    <!-- Include html2canvas for High Res Image Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #1f497d;
+            --secondary: #ed7d31;
+            --danger: #dc3545;
+            --success: #28a745;
+            --bg-color: #f4f4f9;
+        }
+
+        body {
+            font-family: Calibri, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Controls Panel */
+        .controls {
+            width: 100%;
+            max-width: 950px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .controls input[type="text"] {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+            max-width: 100%;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-blue {
+            background-color: var(--primary);
+        }
+
+        .btn-blue:hover {
+            background-color: #143359;
+        }
+
+        .btn-green {
+            background-color: var(--success);
+        }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+        .btn-orange {
+            background-color: var(--secondary);
+            color: black;
+        }
+
+        .btn-orange:hover {
+            background-color: #d66b26;
+            color: white;
+        }
+
+        .btn-red {
+            background-color: var(--danger);
+        }
+
+        .btn-red:hover {
+            background-color: #c82333;
+        }
+
+        /* Printable Area */
+        #printableArea {
+            background-color: #fff;
+            padding: 20px;
+            width: 100%;
+            max-width: 950px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: inline-block;
+            border: 1px dashed transparent;
+            padding: 5px;
+            border-radius: 4px;
+            transition: border 0.2s;
+        }
+
+        .logo-container:hover {
+            border-color: #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .logo-container img {
+            max-width: 180px;
+            max-height: 90px;
+            object-fit: contain;
+        }
+
+        .editable-header {
+            cursor: text;
+            padding: 2px 5px;
+            border: 1px dashed transparent;
+            transition: border 0.2s;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .editable-header:hover,
+        .editable-header:focus {
+            border: 1px dashed #aaa;
+            outline: none;
+            background-color: #fcfcfc;
+        }
+
+        .title-en {
+            font-family: "Times New Roman", Times, serif;
+            color: #b54949;
+            font-size: 24px;
+            margin: 0;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .title-ar {
+            font-family: "Times New Roman", Times, serif;
+            color: #b54949;
+            font-size: 26px;
+            margin: 5px 0 0 0;
+            font-weight: normal;
+        }
+
+        .contact-info {
+            font-weight: bold;
+            font-size: 15px;
+            color: #000;
+            margin-top: 5px;
+        }
+
+        .statement-subtitle {
+            font-weight: bold;
+            font-size: 14.5px;
+            color: var(--primary);
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Table Responsive Wrapper */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 800px;
+            /* Forces scroll on small devices instead of squishing */
+            border-collapse: collapse;
+            border: 2px solid black;
+            font-size: 14.5px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 4px 6px;
+            height: 26px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--secondary);
+            color: black;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        td.editable {
+            cursor: text;
+        }
+
+        td.editable:hover {
+            background-color: #f9f9f9;
+        }
+
+        td.editable:focus {
+            background-color: #e6f2ff;
+            outline: none;
+            box-shadow: inset 0 0 0 1px #007bff;
+        }
+
+        .table-input {
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            text-align: center;
+            outline: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .table-input:focus {
+            background-color: #e6f2ff;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #fdfdfd;
+        }
+
+        .total-row td {
+            border-top: 2px solid black;
+            border-bottom: 2px solid black;
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+
+        .total-label {
+            text-align: center;
+            border-right: none;
+            border-left: none;
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 0 5px;
+            transition: color 0.2s;
+        }
+
+        .del-btn:hover {
+            color: #801420;
+        }
+
+        /* Custom Alert Modal */
+        #customAlert,
+        #confirmModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .alert-box {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 320px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-box h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .alert-box .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 10px;
+            }
+
+            .controls-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls input[type="text"] {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 10px;
+                font-size: 15px;
+            }
+
+            .title-en {
+                font-size: 20px;
+            }
+
+            .title-ar {
+                font-size: 22px;
+            }
+
+            #printableArea {
+                padding: 10px;
+            }
+        }
+    </style>
+    <link href="manifest.json" rel="manifest" />
+    <link href="favicon.ico" rel="icon" type="image/x-icon" />
+</head>
+
+<body>
+    <!-- Controls Panel -->
+    <div class="controls" id="controlsPanel">
+        <div style="flex-grow: 1; max-width: 100%;">
+            <input id="searchInput" placeholder="Search / Filter table..." type="text" />
+        </div>
+        <div class="controls-group">
+            <button class="btn btn-blue" onclick="addNewRow()">+ Add Row</button>
+            <button class="btn btn-green" onclick="exportDB()">Export Data</button>
+            <button class="btn btn-orange" onclick="document.getElementById('importFile').click()">Import Data</button>
+            <input accept=".json" id="importFile" onchange="importDB(event)" style="display: none;" type="file" />
+            <button class="btn btn-red" onclick="exportImage()">Export Image</button>
+            <button class="btn btn-red" onclick="confirmClearAll()" style="background-color: #6c757d;">Clear
+                All</button>
+        </div>
+    </div>
+    <!-- Printable Area -->
+    <div id="printableArea">
+        <div class="header-container">
+            <!-- Clickable Logo Area -->
+            <div class="logo-container" onclick="document.getElementById('logoInput').click()"
+                title="Click to upload/change logo">
+                <img alt="Company Logo" id="companyLogo"
+                    src="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' width='150' height='60' viewBox='0 0 150 60'&gt;&lt;rect width='150' height='60' fill='%23f0f0f0'/&gt;&lt;text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23888'&gt;Upload Logo&lt;/text&gt;&lt;/svg&gt;" />
+                <input accept="image/*" id="logoInput" onchange="handleLogoUpload(event)" style="display: none;"
+                    type="file" />
+            </div>
+            <br />
+            <h1 class="title-en editable-header" contenteditable="true" id="titleEn">LIKE LION GEN, TRANSPORT &amp;
+                MAINTENANCE</h1>
+            <h2 class="title-ar editable-header" contenteditable="true" id="titleAr">لايك ليون للنقليات العامة والصيانه
+            </h2>
+            <div class="contact-info editable-header" contenteditable="true" id="contactInfo">
+                CONTACT# 0506867064   EMAIL: azizrehman00@gmail.com
+            </div>
+        </div>
+        <div class="table-responsive" id="tableWrapper">
+            <table id="invoiceTable">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">S.NO</th>
+                        <th style="width: 14%;">INV SUB DATE</th>
+                        <th style="width: 11%;">INV NO</th>
+                        <th style="width: 11%;">VEH NO</th>
+                        <th style="width: 12%;">MONTH</th>
+                        <th style="width: 14%;">Basic Amount</th>
+                        <th style="width: 12%;">VAT <span class="editable-header" contenteditable="true" id="vatRate"
+                                style="padding: 0 2px;">5</span>%</th>
+                        <th style="width: 15%;">AMOUNT</th>
+                        <th class="action-col hide-on-export" style="width: 5%;">DEL</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows injected here -->
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td class="total-label" colspan="5">Total Amount</td>
+                        <td class="text-right" id="totBasic">0.00</td>
+                        <td class="text-right" id="totVat">0.00</td>
+                        <td class="text-right" id="totAmount">0.00</td>
+                        <td class="action-col hide-on-export"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <!-- Alert Modal -->
+    <div id="customAlert">
+        <div class="alert-box">
+            <h3 id="alertTitle">Notice</h3>
+            <p id="alertMessage"></p>
+            <div class="btn-group">
+                <button class="btn btn-blue" onclick="closeAlert()">OK</button>
+            </div>
+        </div>
+    </div>
+    <!-- Confirm Modal -->
+    <div id="confirmModal">
+        <div class="alert-box">
+            <h3>Confirm Action</h3>
+            <p id="confirmMessage">Are you sure you want to proceed?</p>
+            <div class="btn-group">
+                <button class="btn btn-red" id="confirmYesBtn">Yes, Delete</button>
+                <button class="btn btn-blue" onclick="closeConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const dbName = 'StatementDB';
+        const storeName = 'invoices';
+        const settingsStore = 'settings';
+        let db;
+        let invoiceData = [];
+
+        // UI Helpers
+        function showAlert(msg, title = "Notice") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = msg;
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+        function closeAlert() { document.getElementById('customAlert').style.display = 'none'; }
+
+        let confirmActionCb = null;
+        function showConfirm(msg, cb) {
+            document.getElementById('confirmMessage').innerText = msg;
+            confirmActionCb = cb;
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+        function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; confirmActionCb = null; }
+
+        document.getElementById('confirmYesBtn').addEventListener('click', () => {
+            if (confirmActionCb) confirmActionCb();
+            closeConfirm();
+        });
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, 3); // Bumped version for reliability
+                request.onerror = (e) => reject(e);
+                request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+                request.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains(storeName)) db.createObjectStore(storeName, { keyPath: 'id' });
+                    if (!db.objectStoreNames.contains(settingsStore)) db.createObjectStore(settingsStore, { keyPath: 'id' });
+                };
+            });
+        }
+
+        // Settings (Headers, Logo, VAT)
+        function loadSettings() {
+            return new Promise((resolve) => {
+                const tx = db.transaction(settingsStore, 'readonly');
+                const store = tx.objectStore(settingsStore);
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    const settings = request.result;
+                    settings.forEach(setting => {
+                        if (setting.id === 'companyLogo') {
+                            document.getElementById('companyLogo').src = setting.value;
+                        } else {
+                            const el = document.getElementById(setting.id);
+                            if (el) el.innerHTML = setting.value;
+                        }
+                    });
+                    resolve(settings);
+                };
+            });
+        }
+
+        function saveSetting(id, value) {
+            const tx = db.transaction(settingsStore, 'readwrite');
+            const store = tx.objectStore(settingsStore);
+            store.put({ id, value });
+        }
+
+        // Handle Logo Upload
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const base64Image = e.target.result;
+                document.getElementById('companyLogo').src = base64Image;
+                saveSetting('companyLogo', base64Image);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // VAT Rate Change Logic
+        document.getElementById('vatRate').addEventListener('input', (e) => {
+            const newRateText = e.target.innerText.trim();
+            saveSetting('vatRate', newRateText);
+            const newRate = parseFloat(newRateText) || 0;
+
+            // Recalculate all loaded data
+            invoiceData.forEach(record => {
+                const basic = parseFloat(record.basicAmount) || 0;
+                const vat = Math.round((basic * (newRate / 100)) * 100) / 100;
+                const amount = basic + vat;
+
+                record.vat = (basic === 0 && record.basicAmount === '') ? 0 : vat;
+                record.amount = (basic === 0 && record.basicAmount === '') ? 0 : amount;
+                saveToDB(record);
+            });
+            renderTable(); // Refresh table visually
+        });
+
+        // Load & Save Data
+        function loadData() {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    invoiceData = request.result;
+                    invoiceData.sort((a, b) => a.id - b.id);
+                    resolve(invoiceData);
+                };
+            });
+        }
+
+        function saveToDB(record) {
+            const tx = db.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            store.put(record);
+        }
+
+        function deleteFromDB(id) {
+            const tx = db.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            store.delete(id);
+            invoiceData = invoiceData.filter(r => r.id !== id);
+            renderTable();
+            document.getElementById('searchInput').dispatchEvent(new Event('input'));
+        }
+
+        function confirmClearAll() {
+            showConfirm("Are you sure you want to delete ALL rows? This cannot be undone.", () => {
+                const tx = db.transaction(storeName, 'readwrite');
+                tx.objectStore(storeName).clear();
+                tx.oncomplete = () => {
+                    invoiceData = [];
+                    renderTable();
+                    showAlert("All rows have been cleared.", "Success");
+                };
+            });
+        }
+
+        // Render Table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            invoiceData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = row.id;
+
+                tr.innerHTML = `
+                    <td class="editable text-center" data-field="sno" contenteditable="true">${row.sno || ''}</td>
+                    <td class="text-center">
+                        <input type="date" class="table-input" data-field="date" value="${row.date || ''}">
+                    </td>
+                    <td class="editable text-right" data-field="invNo" contenteditable="true">${row.invNo || ''}</td>
+                    <td class="editable text-right" data-field="vehNo" contenteditable="true">${row.vehNo || ''}</td>
+                    <td class="text-center">
+                        <input type="month" class="table-input" data-field="month" value="${row.month || ''}">
+                    </td>
+                    <td class="editable text-right" data-field="basicAmount" contenteditable="true">${row.basicAmount || ''}</td>
+                    <td class="text-right" data-field="vat">${row.vat ? row.vat.toFixed(2) : ''}</td>
+                    <td class="text-right" data-field="amount">${row.amount ? row.amount.toFixed(2) : ''}</td>
+                    <td class="text-center action-col hide-on-export">
+                        <button class="del-btn" onclick="deleteFromDB(${row.id})" title="Delete Row">×</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateTotals();
+        }
+
+        // Update Totals
+        function updateTotals() {
+            let sumBasic = 0, sumVat = 0, sumAmount = 0;
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const basic = parseFloat(row.querySelector('[data-field="basicAmount"]').innerText) || 0;
+                    const vat = parseFloat(row.querySelector('[data-field="vat"]').innerText) || 0;
+                    const amount = parseFloat(row.querySelector('[data-field="amount"]').innerText) || 0;
+
+                    sumBasic += basic;
+                    sumVat += vat;
+                    sumAmount += amount;
+                }
+            });
+
+            document.getElementById('totBasic').innerText = sumBasic ? sumBasic.toFixed(2) : '0.00';
+            document.getElementById('totVat').innerText = sumVat ? sumVat.toFixed(2) : '0.00';
+            document.getElementById('totAmount').innerText = sumAmount ? sumAmount.toFixed(2) : '0.00';
+        }
+
+        // Add Row with Auto S.NO
+        function addNewRow() {
+            // Auto increment logic
+            let nextSno = 1;
+            if (invoiceData.length > 0) {
+                const snos = invoiceData.map(r => parseInt(r.sno) || 0);
+                nextSno = Math.max(...snos) + 1;
+            }
+
+            const newRecord = {
+                id: Date.now() + Math.random(),
+                sno: nextSno.toString(),
+                date: '', invNo: '', vehNo: '', month: '',
+                basicAmount: '', vat: 0, amount: 0
+            };
+            invoiceData.push(newRecord);
+            saveToDB(newRecord);
+
+            document.getElementById('searchInput').value = ''; // clear search
+            renderTable();
+        }
+
+        // Unified Input Handler (handles both contenteditable and input fields)
+        document.getElementById('tableBody').addEventListener('input', (e) => {
+            const target = e.target;
+            let val, field;
+
+            if (target.classList.contains('editable')) {
+                val = target.innerText.trim();
+                field = target.dataset.field;
+            } else if (target.classList.contains('table-input')) {
+                val = target.value;
+                field = target.dataset.field;
+            } else {
+                return;
+            }
+
+            const tr = target.closest('tr');
+            const rowId = Number(tr.dataset.id);
+            const record = invoiceData.find(r => r.id === rowId);
+
+            if (record) {
+                if (field === 'basicAmount') {
+                    const basic = parseFloat(val) || 0;
+                    const currentVatRate = parseFloat(document.getElementById('vatRate').innerText) || 0;
+
+                    const vat = Math.round((basic * (currentVatRate / 100)) * 100) / 100;
+                    const amount = basic + vat;
+
+                    record.basicAmount = val;
+                    record.vat = basic === 0 && val === '' ? 0 : vat;
+                    record.amount = basic === 0 && val === '' ? 0 : amount;
+
+                    tr.querySelector('[data-field="vat"]').innerText = (basic === 0 && val === '') ? '' : vat.toFixed(2);
+                    tr.querySelector('[data-field="amount"]').innerText = (basic === 0 && val === '') ? '' : amount.toFixed(2);
+
+                    updateTotals();
+                } else {
+                    record[field] = val;
+                }
+                saveToDB(record);
+            }
+        });
+
+        // Prevent Enter in contenteditable
+        document.getElementById('tableBody').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.classList.contains('editable')) {
+                e.preventDefault();
+                e.target.blur();
+            }
+        });
+        document.querySelectorAll('.editable-header').forEach(el => {
+            el.addEventListener('input', (e) => {
+                if (e.target.id !== 'vatRate') { // VAT handled separately above
+                    saveSetting(e.target.id, e.target.innerHTML);
+                }
+            });
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+            });
+        });
+
+        // Search Filter
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            rows.forEach(row => {
+                // Search inputs and contenteditable text
+                const textContent = Array.from(row.children).map(td => {
+                    const input = td.querySelector('input');
+                    return input ? input.value : td.innerText;
+                }).join(' ').toLowerCase();
+
+                row.style.display = textContent.includes(term) ? '' : 'none';
+            });
+            updateTotals();
+        });
+
+        // Import/Export Logic
+        async function exportDB() {
+            try {
+                const headers = await new Promise(resolve => {
+                    const req = db.transaction(settingsStore, 'readonly').objectStore(settingsStore).getAll();
+                    req.onsuccess = () => resolve(req.result);
+                });
+
+                const dataToExport = { invoices: invoiceData, settings: headers };
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'Statement_Backup_' + new Date().toISOString().split('T')[0] + '.json';
+                a.click();
+            } catch (err) {
+                showAlert('Failed to export Database.', 'Error');
+            }
+        }
+
+        function importDB(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (!parsed.invoices || !Array.isArray(parsed.invoices)) throw new Error('Invalid format');
+
+                    const tx = db.transaction([storeName, settingsStore], 'readwrite');
+                    const invStore = tx.objectStore(storeName);
+                    invStore.clear();
+                    parsed.invoices.forEach(inv => invStore.put(inv));
+
+                    if (parsed.settings && Array.isArray(parsed.settings)) {
+                        const setStore = tx.objectStore(settingsStore);
+                        setStore.clear();
+                        parsed.settings.forEach(setting => setStore.put(setting));
+                    }
+                    tx.oncomplete = () => window.location.reload();
+                } catch (err) {
+                    showAlert('Invalid backup file. Could not import.', 'Error');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // Export Image Fix for Scrollable Tables
+        async function exportImage() {
+            const printArea = document.getElementById('printableArea');
+            const tableWrapper = document.getElementById('tableWrapper');
+            const actionCols = document.querySelectorAll('.action-col');
+            const editableHeaders = document.querySelectorAll('.editable-header');
+            const logoContainer = document.querySelector('.logo-container');
+
+            // Pre-export cleanup
+            actionCols.forEach(col => col.style.display = 'none');
+            editableHeaders.forEach(el => el.style.border = '1px solid transparent');
+            logoContainer.style.border = '1px solid transparent';
+
+            // Expand scrollable wrapper temporarily to capture full table width
+            const originalOverflow = tableWrapper.style.overflowX;
+            tableWrapper.style.overflowX = 'visible';
+
+            // Change inputs to spans temporarily so html2canvas renders them nicely without borders
+            const inputs = document.querySelectorAll('.table-input');
+            const placeholders = [];
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                span.innerText = input.value;
+                span.style.fontFamily = 'inherit';
+                span.style.fontSize = 'inherit';
+                input.parentNode.insertBefore(span, input);
+                input.style.display = 'none';
+                placeholders.push({ input, span });
+            });
+
+            try {
+                const canvas = await html2canvas(printArea, {
+                    scale: 3,
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    logging: false,
+                    windowWidth: printArea.scrollWidth // Ensures full width capture
+                });
+
+                const link = document.createElement('a');
+                link.download = 'Statement_' + new Date().toISOString().split('T')[0] + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                showAlert('Failed to generate image.', 'Error');
+            } finally {
+                // Restore post-export
+                actionCols.forEach(col => col.style.display = '');
+                editableHeaders.forEach(el => el.style.border = '');
+                logoContainer.style.border = '';
+                tableWrapper.style.overflowX = originalOverflow;
+
+                placeholders.forEach(p => {
+                    p.input.style.display = '';
+                    p.span.remove();
+                });
+            }
+        }
+
+        // Init
+        async function startApp() {
+            await initDB();
+            await loadSettings();
+            await loadData();
+
+            if (invoiceData.length === 0) {
+                for (let i = 0; i < 4; i++) addNewRow();
+            } else {
+                renderTable();
+            }
+        }
+
+        startApp();
+    </script>
+    <script type="module">
+        import { Workbox } from 'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-window.prod.mjs';
+
+        const swUrl = './sw.js';
+        const wb = new Workbox(swUrl);
+
+        wb.addEventListener('waiting', (event) => {
+            console.log('A new service worker is waiting to activate.');
+            wb.messageSW({ type: 'SKIP_WAITING' });
+        });
+
+        wb.addEventListener('controlling', (event) => {
+            console.log('The new service worker is now in control. Reloading page for updates...');
+            window.location.reload();
+        });
+
+        wb.register();
+    </script>
+</body>
+
+</html>
