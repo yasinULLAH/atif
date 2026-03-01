@@ -58,15 +58,15 @@ if (workbox) {
     },
     {
         "url": "index.html",
-        "revision": "d39b802827168e5d3ad1d3aa0cedf358"
+        "revision": "23cef9463fcb77a121632b2ae1d2fece"
     },
     {
         "url": "index2.html",
-        "revision": "e1d5e496c27b779756c39fa310d34333"
+        "revision": "085a5339d17dd32eeb8be793443251bd"
     },
     {
         "url": "index3.html",
-        "revision": "650d3894cba8fb4926b41b9bf38be77a"
+        "revision": "edcd4f5f76278c7ab4120d3a95048b46"
     },
     {
         "url": "invoice.html",
@@ -74,7 +74,7 @@ if (workbox) {
     },
     {
         "url": "invoice2.html",
-        "revision": "e64d6128c2e8c400d2a03c49c265b643"
+        "revision": "b3df698c0b96886d7a91f656e592be7c"
     },
     {
         "url": "invoice_343_2024-07-15 (1).png",
@@ -206,7 +206,7 @@ if (workbox) {
     },
     {
         "url": "sw.js",
-        "revision": "a7af0b9ff2accac5bb2b950e03e5e279"
+        "revision": "cf1ef35339f85ecf61c1492b9fd7e206"
     },
     {
         "url": "timesheet_Zubair_Ahmed_2025-08 (1).png",

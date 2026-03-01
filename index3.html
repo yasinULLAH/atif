@@ -5,7 +5,6 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Invoice Statement App</title>
-<!-- Include html2canvas for High Res Image Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
         :root {
@@ -58,7 +57,7 @@
             width: 200px;
             max-width: 100%;
         }
-        
+
         .status-toggle {
             display: flex;
             align-items: center;
@@ -276,7 +275,7 @@
             color: inherit;
             cursor: pointer;
         }
-        
+
         select.table-input {
             appearance: none;
             -webkit-appearance: none;
@@ -389,7 +388,8 @@
                 width: 100%;
             }
 
-            .btn, .status-toggle {
+            .btn,
+            .status-toggle {
                 width: 100%;
                 padding: 10px;
                 font-size: 15px;
@@ -414,28 +414,26 @@
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
 </head>
 <body>
-<!-- Controls Panel -->
 <div class="controls" id="controlsPanel">
 <div style="flex-grow: 1; max-width: 100%;">
 <input id="searchInput" placeholder="Search / Filter table..." type="text"/>
 </div>
 <div class="controls-group">
 <label class="status-toggle" title="Toggle whether pending amounts should be added to the total calculation">
-<input checked="" id="includePendingCheck" onchange="updateTotals()" type="checkbox"/> Include Pendings in Totals
+<input checked="" id="includePendingCheck" onchange="updateTotals()" type="checkbox"/> Include Pendings
+                in Totals
             </label>
 <button class="btn btn-blue" onclick="addNewRow()">+ Add Row</button>
 <button class="btn btn-green" onclick="exportDB()">Export Data</button>
 <button class="btn btn-orange" onclick="document.getElementById('importFile').click()">Import Data</button>
-<input accept=".json" id="importFile" onchange="importDB(event)" style="display: none;" type="file">
+<input accept=".json" id="importFile" onchange="importDB(event)" style="display: none;" type="file"/>
 <button class="btn btn-red" onclick="exportImage()">Export Image</button>
 <button class="btn btn-red" onclick="confirmClearAll()" style="background-color: #6c757d;">Clear
                 All</button>
-</input></div>
 </div>
-<!-- Printable Area -->
+</div>
 <div id="printableArea">
 <div class="header-container">
-<!-- Clickable Logo Area -->
 <div class="logo-container" onclick="document.getElementById('logoInput').click()" title="Click to upload/change logo">
 <img alt="Company Logo" id="companyLogo" src="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' width='150' height='60' viewBox='0 0 150 60'&gt;&lt;rect width='150' height='60' fill='%23f0f0f0'/&gt;&lt;text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%23888'&gt;Upload Logo&lt;/text&gt;&lt;/svg&gt;"/>
 <input accept="image/*" id="logoInput" onchange="handleLogoUpload(event)" style="display: none;" type="file"/>
@@ -466,7 +464,6 @@
 </tr>
 </thead>
 <tbody id="tableBody">
-<!-- Rows injected here -->
 </tbody>
 <tfoot>
 <tr class="total-row">
@@ -481,7 +478,6 @@
 </table>
 </div>
 </div>
-<!-- Alert Modal -->
 <div id="customAlert">
 <div class="alert-box">
 <h3 id="alertTitle">Notice</h3>
@@ -491,7 +487,6 @@
 </div>
 </div>
 </div>
-<!-- Confirm Modal -->
 <div id="confirmModal">
 <div class="alert-box">
 <h3>Confirm Action</h3>
@@ -508,15 +503,12 @@
         const settingsStore = 'settings';
         let db;
         let invoiceData = [];
-
-        // UI Helpers
         function showAlert(msg, title = "Notice") {
             document.getElementById('alertTitle').innerText = title;
             document.getElementById('alertMessage').innerText = msg;
             document.getElementById('customAlert').style.display = 'flex';
         }
         function closeAlert() { document.getElementById('customAlert').style.display = 'none'; }
-
         let confirmActionCb = null;
         function showConfirm(msg, cb) {
             document.getElementById('confirmMessage').innerText = msg;
@@ -524,16 +516,13 @@
             document.getElementById('confirmModal').style.display = 'flex';
         }
         function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; confirmActionCb = null; }
-
         document.getElementById('confirmYesBtn').addEventListener('click', () => {
             if (confirmActionCb) confirmActionCb();
             closeConfirm();
         });
-
-        // Initialize IndexedDB
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(dbName, 3); // Bumped version for reliability
+                const request = indexedDB.open(dbName, 3);
                 request.onerror = (e) => reject(e);
                 request.onsuccess = (e) => { db = e.target.result; resolve(db); };
                 request.onupgradeneeded = (e) => {
@@ -543,14 +532,11 @@
                 };
             });
         }
-
-        // Settings (Headers, Logo, VAT)
         function loadSettings() {
             return new Promise((resolve) => {
                 const tx = db.transaction(settingsStore, 'readonly');
                 const store = tx.objectStore(settingsStore);
                 const request = store.getAll();
-
                 request.onsuccess = () => {
                     const settings = request.result;
                     settings.forEach(setting => {
@@ -565,14 +551,11 @@
                 };
             });
         }
-
         function saveSetting(id, value) {
             const tx = db.transaction(settingsStore, 'readwrite');
             const store = tx.objectStore(settingsStore);
             store.put({ id, value });
         }
-
-        // Handle Logo Upload
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -584,33 +567,25 @@
             };
             reader.readAsDataURL(file);
         }
-
-        // VAT Rate Change Logic
         document.getElementById('vatRate').addEventListener('input', (e) => {
             const newRateText = e.target.innerText.trim();
             saveSetting('vatRate', newRateText);
             const newRate = parseFloat(newRateText) || 0;
-
-            // Recalculate all loaded data
             invoiceData.forEach(record => {
                 const basic = parseFloat(record.basicAmount) || 0;
                 const vat = Math.round((basic * (newRate / 100)) * 100) / 100;
                 const amount = basic + vat;
-
                 record.vat = (basic === 0 && record.basicAmount === '') ? 0 : vat;
                 record.amount = (basic === 0 && record.basicAmount === '') ? 0 : amount;
                 saveToDB(record);
             });
-            renderTable(); // Refresh table visually
+            renderTable();
         });
-
-        // Load & Save Data
         function loadData() {
             return new Promise((resolve) => {
                 const tx = db.transaction(storeName, 'readonly');
                 const store = tx.objectStore(storeName);
                 const request = store.getAll();
-
                 request.onsuccess = () => {
                     invoiceData = request.result;
                     invoiceData.sort((a, b) => a.id - b.id);
@@ -618,13 +593,11 @@
                 };
             });
         }
-
         function saveToDB(record) {
             const tx = db.transaction(storeName, 'readwrite');
             const store = tx.objectStore(storeName);
             store.put(record);
         }
-
         function deleteFromDB(id) {
             const tx = db.transaction(storeName, 'readwrite');
             const store = tx.objectStore(storeName);
@@ -633,7 +606,6 @@
             renderTable();
             document.getElementById('searchInput').dispatchEvent(new Event('input'));
         }
-
         function confirmClearAll() {
             showConfirm("Are you sure you want to delete ALL rows? This cannot be undone.", () => {
                 const tx = db.transaction(storeName, 'readwrite');
@@ -645,19 +617,13 @@
                 };
             });
         }
-
-        // Render Table
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-
             invoiceData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.dataset.id = row.id;
-                
-                // Fallback for older database entries
                 const currentStatus = row.status || 'Pending';
-
                 tr.innerHTML = `
                     <td class="editable text-center" data-field="sno" contenteditable="true">${row.sno || ''}</td>
                     <td class="text-center">
@@ -685,47 +651,35 @@
             });
             updateTotals();
         }
-
-        // Update Totals with Pending Filter Logic
         function updateTotals() {
             let sumBasic = 0, sumVat = 0, sumAmount = 0;
             const rows = document.querySelectorAll('#tableBody tr');
             const includePending = document.getElementById('includePendingCheck').checked;
-
             rows.forEach(row => {
                 if (row.style.display !== 'none') {
                     const statusSelect = row.querySelector('.status-select');
                     const status = statusSelect ? statusSelect.value : 'Pending';
-
-                    // If 'Include Pending' is disabled, skip records that are set to Pending
                     if (!includePending && status === 'Pending') {
                         return;
                     }
-
                     const basic = parseFloat(row.querySelector('[data-field="basicAmount"]').innerText) || 0;
                     const vat = parseFloat(row.querySelector('[data-field="vat"]').innerText) || 0;
                     const amount = parseFloat(row.querySelector('[data-field="amount"]').innerText) || 0;
-
                     sumBasic += basic;
                     sumVat += vat;
                     sumAmount += amount;
                 }
             });
-
             document.getElementById('totBasic').innerText = sumBasic ? sumBasic.toFixed(2) : '0.00';
             document.getElementById('totVat').innerText = sumVat ? sumVat.toFixed(2) : '0.00';
             document.getElementById('totAmount').innerText = sumAmount ? sumAmount.toFixed(2) : '0.00';
         }
-
-        // Add Row with Auto S.NO
         function addNewRow() {
-            // Auto increment logic
             let nextSno = 1;
             if (invoiceData.length > 0) {
                 const snos = invoiceData.map(r => parseInt(r.sno) || 0);
                 nextSno = Math.max(...snos) + 1;
             }
-
             const newRecord = {
                 id: Date.now() + Math.random(),
                 sno: nextSno.toString(),
@@ -734,62 +688,47 @@
             };
             invoiceData.push(newRecord);
             saveToDB(newRecord);
-
-            document.getElementById('searchInput').value = ''; // clear search
+            document.getElementById('searchInput').value = '';
             renderTable();
         }
-
-        // Unified Input Handler (handles both contenteditable and input/select fields)
         document.getElementById('tableBody').addEventListener('input', (e) => {
             const target = e.target;
             let val, field;
-
             if (target.classList.contains('editable')) {
                 val = target.innerText.trim();
                 field = target.dataset.field;
             } else if (target.classList.contains('table-input')) {
                 val = target.value;
                 field = target.dataset.field;
-                
-                // Colorize Select field based on status
-                if(field === 'status') {
+                if (field === 'status') {
                     target.style.color = val === 'Paid' ? 'green' : '#d66b26';
                 }
             } else {
                 return;
             }
-
             const tr = target.closest('tr');
             const rowId = Number(tr.dataset.id);
             const record = invoiceData.find(r => r.id === rowId);
-
             if (record) {
                 if (field === 'basicAmount') {
                     const basic = parseFloat(val) || 0;
                     const currentVatRate = parseFloat(document.getElementById('vatRate').innerText) || 0;
-
                     const vat = Math.round((basic * (currentVatRate / 100)) * 100) / 100;
                     const amount = basic + vat;
-
                     record.basicAmount = val;
                     record.vat = basic === 0 && val === '' ? 0 : vat;
                     record.amount = basic === 0 && val === '' ? 0 : amount;
-
                     tr.querySelector('[data-field="vat"]').innerText = (basic === 0 && val === '') ? '' : vat.toFixed(2);
                     tr.querySelector('[data-field="amount"]').innerText = (basic === 0 && val === '') ? '' : amount.toFixed(2);
                 } else {
                     record[field] = val;
                 }
                 saveToDB(record);
-                
-                // Recalculate totals on value/status changes
                 if (field === 'basicAmount' || field === 'status') {
                     updateTotals();
                 }
             }
         });
-
-        // Prevent Enter in contenteditable
         document.getElementById('tableBody').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.target.classList.contains('editable')) {
                 e.preventDefault();
@@ -798,7 +737,7 @@
         });
         document.querySelectorAll('.editable-header').forEach(el => {
             el.addEventListener('input', (e) => {
-                if (e.target.id !== 'vatRate') { // VAT handled separately above
+                if (e.target.id !== 'vatRate') {
                     saveSetting(e.target.id, e.target.innerHTML);
                 }
             });
@@ -806,32 +745,24 @@
                 if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
             });
         });
-
-        // Search Filter
         document.getElementById('searchInput').addEventListener('input', function (e) {
             const term = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('#tableBody tr');
-
             rows.forEach(row => {
-                // Search inputs, selects, and contenteditable text
                 const textContent = Array.from(row.children).map(td => {
                     const input = td.querySelector('.table-input');
                     return input ? input.value : td.innerText;
                 }).join(' ').toLowerCase();
-
                 row.style.display = textContent.includes(term) ? '' : 'none';
             });
             updateTotals();
         });
-
-        // Import/Export Logic
         async function exportDB() {
             try {
                 const headers = await new Promise(resolve => {
                     const req = db.transaction(settingsStore, 'readonly').objectStore(settingsStore).getAll();
                     req.onsuccess = () => resolve(req.result);
                 });
-
                 const dataToExport = { invoices: invoiceData, settings: headers };
                 const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
                 const a = document.createElement('a');
@@ -842,22 +773,18 @@
                 showAlert('Failed to export Database.', 'Error');
             }
         }
-
         function importDB(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (!parsed.invoices || !Array.isArray(parsed.invoices)) throw new Error('Invalid format');
-
                     const tx = db.transaction([storeName, settingsStore], 'readwrite');
                     const invStore = tx.objectStore(storeName);
                     invStore.clear();
                     parsed.invoices.forEach(inv => invStore.put(inv));
-
                     if (parsed.settings && Array.isArray(parsed.settings)) {
                         const setStore = tx.objectStore(settingsStore);
                         setStore.clear();
@@ -871,56 +798,46 @@
             };
             reader.readAsText(file);
         }
-
-        // Export Image Fix for Scrollable Tables
         async function exportImage() {
             const printArea = document.getElementById('printableArea');
             const tableWrapper = document.getElementById('tableWrapper');
             const actionCols = document.querySelectorAll('.action-col');
             const editableHeaders = document.querySelectorAll('.editable-header');
             const logoContainer = document.querySelector('.logo-container');
-
-            // Pre-export cleanup
+            const originalWidth = printArea.style.width;
+            const originalMaxWidth = printArea.style.maxWidth;
+            printArea.style.width = '950px';
+            printArea.style.maxWidth = '950px';
             actionCols.forEach(col => col.style.display = 'none');
             editableHeaders.forEach(el => el.style.border = '1px solid transparent');
             logoContainer.style.border = '1px solid transparent';
-
-            // Expand scrollable wrapper temporarily to capture full table width
             const originalOverflow = tableWrapper.style.overflowX;
             tableWrapper.style.overflowX = 'visible';
-
-            // Change inputs & selects to spans temporarily so html2canvas renders them nicely without borders
             const inputs = document.querySelectorAll('.table-input');
             const placeholders = [];
             inputs.forEach(input => {
                 const span = document.createElement('span');
-                
-                // Get display text properly for dropdown selects
                 if (input.tagName.toLowerCase() === 'select') {
                     span.innerText = input.options[input.selectedIndex].text;
                 } else {
                     span.innerText = input.value;
                 }
-                
                 span.style.fontFamily = 'inherit';
                 span.style.fontSize = 'inherit';
                 span.style.fontWeight = input.style.fontWeight || 'normal';
                 span.style.color = input.style.color || 'inherit';
-                
                 input.parentNode.insertBefore(span, input);
                 input.style.display = 'none';
                 placeholders.push({ input, span });
             });
-
             try {
                 const canvas = await html2canvas(printArea, {
-                    scale: 3,
+                    scale: 4,
                     backgroundColor: '#ffffff',
                     useCORS: true,
                     logging: false,
-                    windowWidth: printArea.scrollWidth // Ensures full width capture
+                    windowWidth: 1200
                 });
-
                 const link = document.createElement('a');
                 link.download = 'Statement_' + new Date().toISOString().split('T')[0] + '.png';
                 link.href = canvas.toDataURL('image/png');
@@ -928,32 +845,28 @@
             } catch (err) {
                 showAlert('Failed to generate image.', 'Error');
             } finally {
-                // Restore post-export
+                printArea.style.width = originalWidth;
+                printArea.style.maxWidth = originalMaxWidth;
                 actionCols.forEach(col => col.style.display = '');
                 editableHeaders.forEach(el => el.style.border = '');
                 logoContainer.style.border = '';
                 tableWrapper.style.overflowX = originalOverflow;
-
                 placeholders.forEach(p => {
                     p.input.style.display = '';
                     p.span.remove();
                 });
             }
         }
-
-        // Init
         async function startApp() {
             await initDB();
             await loadSettings();
             await loadData();
-
             if (invoiceData.length === 0) {
                 for (let i = 0; i < 4; i++) addNewRow();
             } else {
                 renderTable();
             }
         }
-
         startApp();
     </script>
 
